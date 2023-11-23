@@ -21,16 +21,13 @@ public class GameEngine {
     }
 
     private synchronized void Update() {
-        updateThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!updateThread.isInterrupted()) {
-                    try {
-                        onAction.onUpdate();
-                        Thread.sleep(fps);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        updateThread = new Thread(() -> {
+            while (!updateThread.isInterrupted()) {
+                try {
+                    onAction.onUpdate();
+                    Thread.sleep(fps);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -42,16 +39,13 @@ public class GameEngine {
     }
 
     private synchronized void PhysicsCalculation() {
-        physicsThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!physicsThread.isInterrupted()) {
-                    try {
-                        onAction.onPhysicsUpdate();
-                        Thread.sleep(fps);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        physicsThread = new Thread(() -> {
+            while (!physicsThread.isInterrupted()) {
+                try {
+                    onAction.onPhysicsUpdate();
+                    Thread.sleep(fps);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -72,9 +66,9 @@ public class GameEngine {
     public void stop() {
         if (!isStopped) {
             isStopped = true;
-            updateThread.stop();
-            physicsThread.stop();
-            timeThread.stop();
+            updateThread.interrupt();
+            physicsThread.interrupt();
+            timeThread.interrupt();
         }
     }
 
@@ -83,18 +77,15 @@ public class GameEngine {
     private Thread timeThread;
 
     private void TimeStart() {
-        timeThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        time++;
-                        onAction.onTime(time);
-                        Thread.sleep(1);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        timeThread = new Thread(() -> {
+            try {
+                while (true) {
+                    time++;
+                    onAction.onTime(time);
+                    Thread.sleep(1);
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
         timeThread.start();

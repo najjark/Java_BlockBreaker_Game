@@ -86,6 +86,8 @@ public class Block implements Serializable {
             return NO_HIT;
         }
 
+        double epsilon = 1e-6; // A small epsilon value for precision issues
+
         if (xBall >= x && xBall <= x + width && yBall == y + height) {
             return HIT_BOTTOM;
         }

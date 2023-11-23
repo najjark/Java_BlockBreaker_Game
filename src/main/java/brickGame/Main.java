@@ -63,8 +63,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public static String savePath    = "D:/save/save.mdds";
     public static String savePathDir = "D:/save/";
 
-    private ArrayList<Block> blocks = new ArrayList<Block>();
-    private ArrayList<Bonus> chocos = new ArrayList<Bonus>();
+    private ArrayList<Block> blocks = new ArrayList<>();
+    private ArrayList<Bonus> chocos = new ArrayList<>();
     private Color[]          colors = new Color[]{
             Color.MAGENTA,
             Color.RED,
@@ -96,7 +96,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         this.primaryStage = primaryStage;
 
 
-        if (loadFromSave == false) {
+        if (!loadFromSave) {
             level++;
             if (level >1){
                 new Score().showMessage("Level Up :)", this);
@@ -126,7 +126,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         levelLabel.setTranslateY(20);
         heartLabel = new Label("Heart : " + heart);
         heartLabel.setTranslateX(sceneWidth - 70);
-        if (loadFromSave == false) {
+        if (!loadFromSave) {
             root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame);
         } else {
             root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel);
@@ -142,7 +142,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        if (loadFromSave == false) {
+        if (!loadFromSave) {
             if (level > 1 && level < 18) {
                 load.setVisible(false);
                 newGame.setVisible(false);
@@ -152,27 +152,21 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 engine.start();
             }
 
-            load.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    loadGame();
+            load.setOnAction(event -> {
+                loadGame();
 
-                    load.setVisible(false);
-                    newGame.setVisible(false);
-                }
+                load.setVisible(false);
+                newGame.setVisible(false);
             });
 
-            newGame.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    engine = new GameEngine();
-                    engine.setOnAction(Main.this);
-                    engine.setFps(120);
-                    engine.start();
+            newGame.setOnAction(event -> {
+                engine = new GameEngine();
+                engine.setOnAction(Main.this);
+                engine.setFps(120);
+                engine.start();
 
-                    load.setVisible(false);
-                    newGame.setVisible(false);
-                }
+                load.setVisible(false);
+                newGame.setVisible(false);
             });
         } else {
             engine = new GameEngine();
@@ -186,9 +180,15 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void initBoard() {
+
+        blocks.clear();
+        destroyedBlockCount = 0;
+
+        Random random = new Random();
+
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < level + 1; j++) {
-                int r = new Random().nextInt(500);
+                int r = random.nextInt(500);
                 if (r % 5 == 0) {
                     continue;
                 }
@@ -240,31 +240,28 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     float oldXBreak;
 
     private void move(final int direction) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int sleepTime = 4;
-                for (int i = 0; i < 30; i++) {
-                    if (xBreak == (sceneWidth - breakWidth) && direction == RIGHT) {
-                        return;
-                    }
-                    if (xBreak == 0 && direction == LEFT) {
-                        return;
-                    }
-                    if (direction == RIGHT) {
-                        xBreak++;
-                    } else {
-                        xBreak--;
-                    }
-                    centerBreakX = xBreak + halfBreakWidth;
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (i >= 20) {
-                        sleepTime = i;
-                    }
+        new Thread(() -> {
+            int sleepTime = 4;
+            for (int i = 0; i < 30; i++) {
+                if (xBreak == (sceneWidth - breakWidth) && direction == RIGHT) {
+                    return;
+                }
+                if (xBreak == 0 && direction == LEFT) {
+                    return;
+                }
+                if (direction == RIGHT) {
+                    xBreak++;
+                } else {
+                    xBreak--;
+                }
+                centerBreakX = xBreak + halfBreakWidth;
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (i >= 20) {
+                    sleepTime = i;
                 }
             }
         }).start();
@@ -452,68 +449,65 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void saveGame() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new File(savePathDir).mkdirs();
-                File file = new File(savePath);
-                ObjectOutputStream outputStream = null;
-                try {
-                    outputStream = new ObjectOutputStream(new FileOutputStream(file));
+        new Thread(() -> {
+            new File(savePathDir).mkdirs();
+            File file = new File(savePath);
+            ObjectOutputStream outputStream = null;
+            try {
+                outputStream = new ObjectOutputStream(new FileOutputStream(file));
 
-                    outputStream.writeInt(level);
-                    outputStream.writeInt(score);
-                    outputStream.writeInt(heart);
-                    outputStream.writeInt(destroyedBlockCount);
+                outputStream.writeInt(level);
+                outputStream.writeInt(score);
+                outputStream.writeInt(heart);
+                outputStream.writeInt(destroyedBlockCount);
 
 
-                    outputStream.writeDouble(xBall);
-                    outputStream.writeDouble(yBall);
-                    outputStream.writeDouble(xBreak);
-                    outputStream.writeDouble(yBreak);
-                    outputStream.writeDouble(centerBreakX);
-                    outputStream.writeLong(time);
-                    outputStream.writeLong(goldTime);
-                    outputStream.writeDouble(vX);
+                outputStream.writeDouble(xBall);
+                outputStream.writeDouble(yBall);
+                outputStream.writeDouble(xBreak);
+                outputStream.writeDouble(yBreak);
+                outputStream.writeDouble(centerBreakX);
+                outputStream.writeLong(time);
+                outputStream.writeLong(goldTime);
+                outputStream.writeDouble(vX);
 
 
-                    outputStream.writeBoolean(isExistHeartBlock);
-                    outputStream.writeBoolean(isGoldStauts);
-                    outputStream.writeBoolean(goDownBall);
-                    outputStream.writeBoolean(goRightBall);
-                    outputStream.writeBoolean(colideToBreak);
-                    outputStream.writeBoolean(colideToBreakAndMoveToRight);
-                    outputStream.writeBoolean(colideToRightWall);
-                    outputStream.writeBoolean(colideToLeftWall);
-                    outputStream.writeBoolean(colideToRightBlock);
-                    outputStream.writeBoolean(colideToBottomBlock);
-                    outputStream.writeBoolean(colideToLeftBlock);
-                    outputStream.writeBoolean(colideToTopBlock);
+                outputStream.writeBoolean(isExistHeartBlock);
+                outputStream.writeBoolean(isGoldStauts);
+                outputStream.writeBoolean(goDownBall);
+                outputStream.writeBoolean(goRightBall);
+                outputStream.writeBoolean(colideToBreak);
+                outputStream.writeBoolean(colideToBreakAndMoveToRight);
+                outputStream.writeBoolean(colideToRightWall);
+                outputStream.writeBoolean(colideToLeftWall);
+                outputStream.writeBoolean(colideToRightBlock);
+                outputStream.writeBoolean(colideToBottomBlock);
+                outputStream.writeBoolean(colideToLeftBlock);
+                outputStream.writeBoolean(colideToTopBlock);
 
-                    ArrayList<BlockSerializable> blockSerializables = new ArrayList<BlockSerializable>();
-                    for (Block block : blocks) {
-                        if (block.isDestroyed) {
-                            continue;
-                        }
-                        blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
+                ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
+                for (Block block : blocks) {
+                    if (block.isDestroyed) {
+                        continue;
                     }
+                    blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
+                }
 
-                    outputStream.writeObject(blockSerializables);
+                outputStream.writeObject(blockSerializables);
 
-                    new Score().showMessage("Game Saved", Main.this);
+                new Score().showMessage("Game Saved", Main.this);
 
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    outputStream.flush();
+                    outputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
-                    try {
-                        outputStream.flush();
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         }).start();
@@ -571,33 +565,31 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void nextLevel() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    vX = 1.000;
+        Platform.runLater(() -> {
+            try {
+            vX = 1.000;
 
-                    engine.stop();
-                    resetColideFlags();
-                    goDownBall = true;
+            engine.stop();
+            resetColideFlags();
+            goDownBall = true;
 
-                    isGoldStauts = false;
-                    isExistHeartBlock = false;
+            isGoldStauts = false;
+            isExistHeartBlock = false;
 
 
-                    hitTime = 0;
-                    time = 0;
-                    goldTime = 0;
+            hitTime = 0;
+            time = 0;
+            goldTime = 0;
 
-                    engine.stop();
-                    blocks.clear();
-                    chocos.clear();
-                    destroyedBlockCount = 0;
-                    start(primaryStage);
+            blocks.clear();
+            chocos.clear();
+            destroyedBlockCount = 0;
+            initBoard();
+            start(primaryStage);
+            engine.stop();
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -631,21 +623,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     @Override
     public void onUpdate() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+        Platform.runLater(() -> {
 
-                scoreLabel.setText("Score: " + score);
-                heartLabel.setText("Heart : " + heart);
+            scoreLabel.setText("Score: " + score);
+            heartLabel.setText("Heart : " + heart);
 
-                rect.setX(xBreak);
-                rect.setY(yBreak);
-                ball.setCenterX(xBall);
-                ball.setCenterY(yBall);
+            rect.setX(xBreak);
+            rect.setY(yBreak);
+            ball.setCenterX(xBall);
+            ball.setCenterY(yBall);
 
-                for (Bonus choco : chocos) {
-                    choco.choco.setY(choco.y);
-                }
+            for (Bonus choco : chocos) {
+                choco.choco.setY(choco.y);
             }
         });
 
@@ -667,12 +656,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     if (block.type == Block.BLOCK_CHOCO) {
                         final Bonus choco = new Bonus(block.row, block.column);
                         choco.timeCreated = time;
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                root.getChildren().add(choco.choco);
-                            }
-                        });
+                        Platform.runLater(() -> root.getChildren().add(choco.choco));
                         chocos.add(choco);
                     }
 
