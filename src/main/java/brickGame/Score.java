@@ -1,10 +1,12 @@
 package brickGame;
 
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 //import sun.plugin2.message.Message;
 
 public class Score {
@@ -19,20 +21,44 @@ public class Score {
         label.setTranslateX(x);
         label.setTranslateY(y);
 
-        Platform.runLater(() -> main.root.getChildren().add(label));
-
-        new Thread(() -> {
-            for (int i = 0; i < 21; i++) {
-                try {
-                    label.setScaleX(i);
-                    label.setScaleY(i);
-                    label.setOpacity((20 - i) / 20.0);
-                    Thread.sleep(15);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+//        Platform.runLater(() -> {
+//            main.root.getChildren().add(label);
+//            for (int i = 0; i < 1_000_001; i++) {
+////                try {
+//                    label.setScaleX(i);
+//                    label.setScaleY(i);
+//                    label.setOpacity((1_000_000 - i) / 1_000_000.00f);
+////                    Thread.sleep(15);
+////                } catch (InterruptedException e) {
+////                    e.printStackTrace();
+////                    break;
+////                }
+//            }
+//
+//        });
+        Platform.runLater(() -> {
+                    main.root.getChildren().add(label);
+                    ScaleTransition ani = new ScaleTransition(Duration.millis(800), label);
+                    ani.setFromX(0);
+                    ani.setToX(10.0);
+                    ani.setFromY(0);
+                    ani.setToY(10.0f);
+                    ani.setCycleCount(1);
+                    ani.play();
+                    ani.setOnFinished(event -> main.root.getChildren().remove(label));
+                });
+//        new Thread(() -> {
+//            for (int i = 0; i < 21; i++) {
+//                try {
+//                    label.setScaleX(i);
+//                    label.setScaleY(i);
+//                    label.setOpacity((20 - i) / 20.0);
+//                    Thread.sleep(15);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
     }
 
     public void showMessage(String message, final Main main) {

@@ -86,22 +86,24 @@ public class Block implements Serializable {
             return NO_HIT;
         }
 
-        double epsilon = 1e-6; // A small epsilon value for precision issues
+        if (yBall >= y && yBall <= y + height + Main.ballRadius && xBall >= x + width - 2 && xBall <= x + width + 2 ) {
+            System.out.println("Collision with right side of the block!");
+            return HIT_RIGHT;
+        }
+
+        if (yBall >= y && yBall <= y + height + Main.ballRadius && xBall >= x - 2 && xBall <= x + 2) {
+            System.out.println("Collision with left side of the block!");
+            return HIT_LEFT;
+        }
 
         if (xBall >= x && xBall <= x + width && yBall == y + height) {
+            System.out.println("Collision with bottom side of the block!");
             return HIT_BOTTOM;
         }
 
         if (xBall >= x && xBall <= x + width && yBall == y) {
+            System.out.println("Collision with top side of the block!");
             return HIT_TOP;
-        }
-
-        if (yBall >= y && yBall <= y + height && xBall == x + width) {
-            return HIT_RIGHT;
-        }
-
-        if (yBall >= y && yBall <= y + height && xBall == x) {
-            return HIT_LEFT;
         }
 
         return NO_HIT;
@@ -122,5 +124,4 @@ public class Block implements Serializable {
     public static int getWidth() {
         return block.width;
     }
-
 }

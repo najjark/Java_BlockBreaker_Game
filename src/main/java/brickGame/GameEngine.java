@@ -28,6 +28,7 @@ public class GameEngine {
                     Thread.sleep(fps);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    break;  // loop was not breaking causing the program to enter nextLevel and initBoard indefinitely
                 }
             }
         });
@@ -39,13 +40,17 @@ public class GameEngine {
     }
 
     private synchronized void PhysicsCalculation() {
-        physicsThread = new Thread(() -> {
-            while (!physicsThread.isInterrupted()) {
-                try {
-                    onAction.onPhysicsUpdate();
-                    Thread.sleep(fps);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        physicsThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!physicsThread.isInterrupted()) {
+                    try {
+                        onAction.onPhysicsUpdate();
+                        Thread.sleep(fps);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        break;  // loop was not breaking causing the program to enter nextLevel and initBoard indefinitely
+                    }
                 }
             }
         });
@@ -77,15 +82,18 @@ public class GameEngine {
     private Thread timeThread;
 
     private void TimeStart() {
-        timeThread = new Thread(() -> {
-            try {
-                while (true) {
-                    time++;
-                    onAction.onTime(time);
-                    Thread.sleep(1);
+        timeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        time++;
+                        onAction.onTime(time);
+                        Thread.sleep(1);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         });
         timeThread.start();
