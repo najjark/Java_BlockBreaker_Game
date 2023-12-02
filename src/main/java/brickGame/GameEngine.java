@@ -27,7 +27,7 @@ public class GameEngine {
                     onAction.onUpdate();
                     Thread.sleep(fps);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     break;  // loop was not breaking causing the program to enter nextLevel and initBoard indefinitely
                 }
             }
@@ -48,7 +48,7 @@ public class GameEngine {
                         onAction.onPhysicsUpdate();
                         Thread.sleep(fps);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                         break;  // loop was not breaking causing the program to enter nextLevel and initBoard indefinitely
                     }
                 }
@@ -92,7 +92,7 @@ public class GameEngine {
                         Thread.sleep(1);
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         });
