@@ -37,8 +37,7 @@ public class LoadSave {
     public void read() {
 
 
-        try {
-            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(new File(Main.savePath)));
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(Main.savePath))) {
 
 
             level = inputStream.readInt();
@@ -73,11 +72,17 @@ public class LoadSave {
 
             try {
                 blocks = (ArrayList<BlockSerializable>) inputStream.readObject();
-            } catch (ClassNotFoundException e) {
+            }  /* catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } */
+
+            catch (IOException | ClassNotFoundException e) {
+                System.out.println("Error during deserialization: " + e.getMessage());
                 e.printStackTrace();
             }
 
         } catch (IOException e) {
+            System.out.println("Load Error");
             e.printStackTrace();
         }
 

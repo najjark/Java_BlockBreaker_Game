@@ -35,7 +35,7 @@ public class GameEngine {
         updateThread.start();
     }
 
-    private void Initialize() {
+    private synchronized void Initialize() {
         onAction.onInit();
     }
 
@@ -59,7 +59,7 @@ public class GameEngine {
 
     }
 
-    public void start() {
+    public synchronized void start() {
         time = 0;
         Initialize();
         Update();
@@ -68,7 +68,7 @@ public class GameEngine {
         isStopped = false;
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if (!isStopped) {
             isStopped = true;
             updateThread.interrupt();
@@ -81,7 +81,7 @@ public class GameEngine {
 
     private Thread timeThread;
 
-    private void TimeStart() {
+    private synchronized void TimeStart() {
         timeThread = new Thread(new Runnable() {
             @Override
             public void run() {

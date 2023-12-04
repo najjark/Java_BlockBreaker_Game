@@ -18,7 +18,7 @@ public class Score {
             sign = "";
         }
 
-        // Adjust the score for gold ball
+        //Adjust the score for gold ball
         if (main.isGoldStatus) {
             score = 2;
         }
@@ -45,7 +45,7 @@ public class Score {
         label.setTranslateX(220);
         label.setTranslateY(340);
 
-        Platform.runLater(() -> main.root.getChildren().add(label));
+        /* Platform.runLater(() -> main.root.getChildren().add(label));
 
         new Thread(() -> {
             for (int i = 0; i < 21; i++) {
@@ -58,7 +58,19 @@ public class Score {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();  */
+
+        Platform.runLater(() -> {
+            main.root.getChildren().add(label);
+            ScaleTransition ani = new ScaleTransition(Duration.millis(500), label);
+            ani.setFromX(10.0);
+            ani.setToX(0);
+            ani.setFromY(10.0);
+            ani.setToY(0);
+            ani.setCycleCount(1);
+            ani.play();
+            ani.setOnFinished(event -> main.root.getChildren().remove(label));
+        });
     }
 
     public void showGameOver(final Main main) {
@@ -88,7 +100,12 @@ public class Score {
             label.setScaleY(2);
 
 
-            main.root.getChildren().addAll(label);
+            Button restart = new Button("Restart");
+            restart.setTranslateX(220);
+            restart.setTranslateY(300);
+            restart.setOnAction(event -> main.restartGame());
+
+            main.root.getChildren().addAll(label, restart);
 
         });
     }

@@ -44,6 +44,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private double yBall;
 
     public boolean isGoldStatus = false;
+    public boolean isSizeBoost = false;
     private boolean isExistHeartBlock = false;
 
     private boolean isPaused = false;
@@ -53,17 +54,24 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     private int destroyedBlockCount = 0;
 
-    //private double v = 1.000;
+    private double v = 1.000;
 
     private int heart = 3;
     private int score = 0;
     private long time = 0;
     private long hitTime = 0;
     private long goldTime = 0;
+    private long sizeBoostTime = 0;
 
     private GameEngine engine;
-    public static String savePath = "D:/save/save.mdds";
-    public static String savePathDir = "D:/save/";
+
+    //public static String savePath = "D:/save/save.mdds";
+
+    // Define a constant for the save directory
+    public static final String savePath = "C:/Users/Khalid/Desktop/BlockBreakerTest";
+
+
+    //public static String savePathDir = "D:/save/";
 
     private ArrayList<Block> blocks = new ArrayList<Block>();
     private ArrayList<Bonus> chocos = new ArrayList<Bonus>();
@@ -103,10 +111,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             if (level > 1) {
                 new Score().showMessage("Level Up :)", this);
             }
-            if (level == 18) {
+            if (level == 4) {
                 new Score().showWin(this);
                 return;
             }
+
+            root = new Pane();
 
             initBall();
             initBreak();
@@ -129,7 +139,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         heartLabel = new Label("Heart : " + heart);
         heartLabel.setTranslateX(sceneWidth - 70);
         if (!loadFromSave) {
-            root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame);
+            root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame,load);
         } else {
             root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel);
         }
@@ -145,7 +155,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         primaryStage.show();
 
         if (!loadFromSave) {
-            if (level > 1 && level < 18) {
+            if (level > 1 && level < 4) {
+                //System.out.println("1");
                 load.setVisible(false);
                 newGame.setVisible(false);
                 engine = new GameEngine();
@@ -185,33 +196,34 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void initBoard() {
-        System.out.println("Entering initBoard");
+        //System.out.println("Entering initBoard");
+
+        Random random = new Random();  // Move Random instance outside the loop
+
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < level + 1; j++) {
-                int r = new Random().nextInt(500);
-                if (r % 5 == 0) {
-                    continue;
-                }
+                int r = random.nextInt(500);
+
+                // Adjusted conditions to ensure better block distribution
                 int type;
                 if (r % 10 == 1) {
                     type = Block.BLOCK_CHOCO;
-                } else if (r % 10 == 2) {
-                    if (!isExistHeartBlock) {
-                        type = Block.BLOCK_HEART;
-                        isExistHeartBlock = true;
-                    } else {
-                        type = Block.BLOCK_NORMAL;
-                    }
-                } else if (r % 10 == 3) {
+                } else if (r % 10 == 2 && !isExistHeartBlock) {
+                    type = Block.BLOCK_HEART;
+                    isExistHeartBlock = true;
+                } else if (r % 10 == 4) {
                     type = Block.BLOCK_STAR;
+                } else if (r % 10 == 3) {
+                    type = Block.BLOCK_SIZEBOOST;
                 } else {
                     type = Block.BLOCK_NORMAL;
                 }
-                blocks.add(new Block(j, i, colors[r % (colors.length)], type));
-                //System.out.println("colors " + r % (colors.length));
+
+                blocks.add(new Block(j, i, colors[r % colors.length], type));
             }
         }
     }
+
 
 
     public static void main(String[] args) {
@@ -341,7 +353,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void setPhysicsToBall() {
-        //v = ((time - hitTime) / 1000.000) + 1.000;
+        v = ((time - hitTime) / 1000.000) + 1.000;
 
         if (goDownBall) {
             yBall += vY;
@@ -354,6 +366,19 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         } else {
             xBall -= vX;
         }
+
+
+        // Adjust the ball's appearance for the size boost
+        Platform.runLater(() -> {
+            if (isSizeBoost) {
+                ballRadius = 20; // Adjust the radius for the boost
+                //ball.setFill(new ImagePattern(new Image("ball.png")));
+            } else {
+                ballRadius = 10; // Set it back to the normal radius
+                //ball.setFill(new ImagePattern(new Image("ball.png")));
+            }
+            ball.setRadius(ballRadius); // Update the ball's radius
+        });
 
         if (yBall <= 0) {
             //vX = 1.000;
@@ -434,14 +459,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
         //Wall Collide
 
-        /* if (collideToRightWall) { // same as line 391
-            goRightBall = false;
-        }
-
-        if (collideToLeftWall) { // same as line 397
-            goRightBall = true;
-        } */
-
         //Block Collide
 
         if (collideToRightBlock) { // handles collision with each side of blocks
@@ -460,7 +477,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             goDownBall = true;
         }
 
-
     }
 
 
@@ -474,21 +490,42 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void saveGame() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new File(savePathDir).mkdirs();
-                File file = new File(savePath);
-                ObjectOutputStream outputStream = null;
-                try {
-                    outputStream = new ObjectOutputStream(new FileOutputStream(file));
+        new Thread(() -> {
+            try {
+                // Specify the filename
+                String saveFileName = "GameSave";
 
+                // Construct the full save path
+                String savePath = Main.savePath + File.separator + saveFileName;
+
+                // Create the File object
+                File file = new File(savePath);
+
+
+                // Print debug information
+                System.out.println("Directory exists: " + file.getParentFile().exists());
+                System.out.println("Directory path: " + file.getParentFile().getAbsolutePath());
+                System.out.println("Full save path: " + savePath);
+                System.out.println("File exists: " + file.exists());
+                System.out.println("File path: " + file.getAbsolutePath());
+
+                // Check if the parent directory exists, create if not
+                if (!file.getParentFile().exists()) {
+                    if (file.getParentFile().mkdirs()) {
+                        System.out.println("Directory created: " + file.getParentFile().getAbsolutePath());
+                    } else {
+                        System.err.println("Failed to create directory: " + file.getParentFile().getAbsolutePath());
+                        return;
+                    }
+                }
+
+                // Add the try-catch block for file creation
+                try {
+                    ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
                     outputStream.writeInt(level);
                     outputStream.writeInt(score);
                     outputStream.writeInt(heart);
                     outputStream.writeInt(destroyedBlockCount);
-
-
                     outputStream.writeDouble(xBall);
                     outputStream.writeDouble(yBall);
                     outputStream.writeDouble(xBreak);
@@ -497,8 +534,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     outputStream.writeLong(time);
                     outputStream.writeLong(goldTime);
                     outputStream.writeDouble(vX);
-
-
                     outputStream.writeBoolean(isExistHeartBlock);
                     outputStream.writeBoolean(isGoldStatus);
                     outputStream.writeBoolean(goDownBall);
@@ -512,35 +547,32 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     outputStream.writeBoolean(collideToLeftBlock);
                     outputStream.writeBoolean(collideToTopBlock);
 
-                    ArrayList<BlockSerializable> blockSerializables = new ArrayList<BlockSerializable>();
+                    ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
                     for (Block block : blocks) {
-                        if (block.isDestroyed) {
-                            continue;
+                        if (!block.isDestroyed) {
+                            blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
                         }
-                        blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
                     }
 
                     outputStream.writeObject(blockSerializables);
 
                     new Score().showMessage("Game Saved", Main.this);
 
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
-                    try {
-                        outputStream.flush();
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    System.err.println("Error during file creation: " + e.getMessage());
+                    return;
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Unexpected Exception: " + e.getMessage());
             }
         }).start();
-
     }
+
+
+
 
     private void loadGame() {
 
@@ -576,10 +608,17 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         blocks.clear();
         chocos.clear();
 
-        for (BlockSerializable ser : loadSave.blocks) {
+        /* for (BlockSerializable ser : loadSave.blocks) {
             int r = new Random().nextInt(200);
             blocks.add(new Block(ser.row, ser.j, colors[r % colors.length], ser.type));
+        } */
+
+        Random random = new Random();
+        for (BlockSerializable ser : loadSave.blocks) {
+            int r = random.nextInt(200);
+            blocks.add(new Block(ser.row, ser.j, colors[r % colors.length], ser.type));
         }
+
 
 
         try {
@@ -593,7 +632,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void nextLevel() {
-        System.out.println("Entering nextlevel");
+        System.out.println("Entering next level");
         Platform.runLater(() -> {
             try {
                 vX = 1.000;
@@ -604,11 +643,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
                 isGoldStatus = false;
                 isExistHeartBlock = false;
+                isSizeBoost = false;
 
 
                 hitTime = 0;
                 time = 0;
                 goldTime = 0;
+                sizeBoostTime = 0;
 
                 //engine.stop();
                 blocks.clear();
@@ -633,11 +674,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             resetCollideFlags();
             goDownBall = true;
 
+            isSizeBoost = false;
             isGoldStatus = false;
             isExistHeartBlock = false;
             hitTime = 0;
             time = 0;
             goldTime = 0;
+            sizeBoostTime = 0;
 
             blocks.clear();
             chocos.clear();
@@ -688,6 +731,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                         //System.out.println("size is " + blocks.size());
                         resetCollideFlags();
 
+                        if (block.type == Block.BLOCK_SIZEBOOST) {
+                            System.out.println("Size Boost");
+                            sizeBoostTime = time;
+                            ballRadius = 20;
+                            isSizeBoost = true;
+                        }
+
                         if (block.type == Block.BLOCK_CHOCO) {
                             final Bonus choco = new Bonus(block.row, block.column);
                             choco.timeCreated = time;
@@ -707,16 +757,20 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                             heart++;
                         }
 
-                        if (hitCode == Block.HIT_RIGHT) {
-                            collideToRightBlock = true;
-                        } else if (hitCode == Block.HIT_BOTTOM) {
-                            collideToBottomBlock = true;
-                        } else if (hitCode == Block.HIT_LEFT) {
-                            collideToLeftBlock = true;
-                        } else if (hitCode == Block.HIT_TOP) {
-                            collideToTopBlock = true;
+                        if (isGoldStatus) { // allows gold ball to skip collision detection
+                            continue;
                         }
-
+                        else {
+                            if (hitCode == Block.HIT_RIGHT) {
+                                collideToRightBlock = true;
+                            } else if (hitCode == Block.HIT_BOTTOM) {
+                                collideToBottomBlock = true;
+                            } else if (hitCode == Block.HIT_LEFT) {
+                                collideToLeftBlock = true;
+                            } else if (hitCode == Block.HIT_TOP) {
+                                collideToTopBlock = true;
+                            }
+                        }
                     }
                 }
                 //TODO hit to break and some work here....
@@ -739,10 +793,25 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
 
 
-        if (time - goldTime > 10000) {
+        if (time - goldTime > 5000) {
             ball.setFill(new ImagePattern(new Image("ball.png")));
             root.getStyleClass().remove("goldRoot");
             isGoldStatus = false;
+        }
+
+        if (isSizeBoost) {
+            if (time - sizeBoostTime > 5000) {
+                isSizeBoost = false;
+                System.out.println("Size Boost ended");
+
+                // Reset the ball's radius to its original size
+                ballRadius = 10;
+
+                // Revert the ball's appearance to normal
+                Platform.runLater(() -> {
+                    ball.setFill(new ImagePattern(new Image("ball.png")));
+                });
+            }
         }
 
         for (Bonus choco : chocos) {

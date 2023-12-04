@@ -14,7 +14,6 @@ public class Bonus implements Serializable {
     public double y;
     public long timeCreated;
     public boolean taken = false;
-
     public Bonus(int row, int column) {
         x = (column * (Block.getWidth())) + Block.getPaddingH() + (Block.getWidth() / 2) - 15;
         y = (row * (Block.getHeight())) + Block.getPaddingTop() + (Block.getHeight() / 2) - 15;
