@@ -45,21 +45,6 @@ public class Score {
         label.setTranslateX(220);
         label.setTranslateY(340);
 
-        /* Platform.runLater(() -> main.root.getChildren().add(label));
-
-        new Thread(() -> {
-            for (int i = 0; i < 21; i++) {
-                try {
-                    label.setScaleX(Math.abs(i-10));
-                    label.setScaleY(Math.abs(i-10));
-                    label.setOpacity((20 - i) / 20.0);
-                    Thread.sleep(15);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();  */
-
         Platform.runLater(() -> {
             main.root.getChildren().add(label);
             ScaleTransition ani = new ScaleTransition(Duration.millis(500), label);
@@ -93,11 +78,11 @@ public class Score {
 
     public void showWin(final Main main) {
         Platform.runLater(() -> {
-            Label label = new Label("You Win :)");
-            label.setTranslateX(200);
-            label.setTranslateY(250);
-            label.setScaleX(2);
-            label.setScaleY(2);
+            Label pauselabel = new Label("You Win :)");
+            pauselabel.setTranslateX(200);
+            pauselabel.setTranslateY(250);
+            pauselabel.setScaleX(2);
+            pauselabel.setScaleY(2);
 
 
             Button restart = new Button("Restart");
@@ -105,8 +90,22 @@ public class Score {
             restart.setTranslateY(300);
             restart.setOnAction(event -> main.restartGame());
 
-            main.root.getChildren().addAll(label, restart);
+            main.root.getChildren().addAll(pauselabel, restart);
 
         });
     }
+
+
+    /* public void showPause(final Main main) {
+        Platform.runLater(() -> {
+            Label label = new Label("Game Paused");
+            label.setTranslateX(200);
+            label.setTranslateY(250);
+            label.setScaleX(2);
+            label.setScaleY(2);
+
+            main.root.getChildren().addAll(label);
+
+        });
+    } */
 }
