@@ -7,8 +7,8 @@ import javafx.scene.shape.Circle;
 public class CreateBall extends Circle {
     GameState gameState = new GameState();
     public CreateBall() {
-        System.out.println("Initial x-coordinate: " + (gameState.sceneWidth / 2.0));
-        System.out.println("Initial y-coordinate: " + (gameState.yBreak - 100));
+        //System.out.println("Initial x-coordinate: " + (gameState.sceneWidth / 2.0));
+        //System.out.println("Initial y-coordinate: " + (gameState.yBreak - 100));
         //Random random = new Random();
         setCenterX(250);  // Set x-coordinate to the center of the scene
         setCenterY(500);

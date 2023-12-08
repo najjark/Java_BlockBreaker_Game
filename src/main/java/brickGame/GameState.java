@@ -20,7 +20,7 @@ public class GameState {
     public boolean isSizeBoost;
     public boolean isPaddleSmall;
     public boolean isExistHeartBlock;
-    public static int ballRadius;
+    public int ballRadius;
     public int destroyedBlockCount;
     public double v;
     public int heart;
@@ -58,9 +58,8 @@ public class GameState {
         this.isGoldStatus = false;
         this.isSizeBoost = false;
         this.isPaddleSmall = false;
-        this.xBreak = 0.0f;
         this.yBall = 500.0f;
-        this.xBreak = 0.0f;
+        this.xBreak = 200.0f;
         this.yBreak = 660.0f;
         this.ballRadius = 10;
         this.xBall = 250;

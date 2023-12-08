@@ -123,7 +123,7 @@ public class Block implements Serializable {
         }
 
         if (yBall >= y + height -  ball.getRadius() && yBall <= y + height + buffer && xBall >= x && xBall <= x + width) {
-        System.out.println("Collision with bottom side of the block!");
+        //System.out.println("Collision with bottom side of the block!");
         return HIT_BOTTOM;
         }
 

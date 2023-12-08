@@ -12,10 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -24,16 +21,14 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     GameState gameState = new GameState();
     private static int LEFT = 1;
     private static int RIGHT = 2;
-
     private CreateBall ball;
-    private Rectangle rect;
+    private Paddle rect;
     private GameEngine engine;
 
     //public static String savePath = "D:/save/save.mdds";
 
     // Define a constant for the save directory
     public static final String savePath = "C:/Users/Khalid/Desktop/BlockBreakerTest";
-
 
     //public static String savePathDir = "D:/save/";
 
@@ -83,9 +78,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 }
 
                 root = new Pane();
-
                 ball = new CreateBall();
-                initBreak();
+                rect = new Paddle();
                 initBoard();
 
                 load = new Button("Load Game");
@@ -163,8 +157,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void initBoard() {
-        //System.out.println("Entering initBoard");
-
         Random random = new Random();  // Move Random instance outside the loop
 
         for (int i = 0; i < 4; i++) {
@@ -192,8 +184,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
     }
-
-
 
     public static void main(String[] args) {
         launch(args);
@@ -231,8 +221,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
-    //float oldXBreak;
-
     private void move(final int direction) {
         new Thread(new Runnable() {
             @Override
@@ -266,39 +254,14 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     }
 
-    private void initBreak() {
-        rect = new Rectangle();
-        rect.setWidth(gameState.breakWidth);
-        rect.setHeight(gameState.breakHeight);
-
-        // Set x-coordinate to the center of the scene
-        gameState.xBreak = (gameState.sceneWidth - gameState.breakWidth) / 2.0;
-
-        rect.setX(gameState.xBreak);
-        rect.setY(gameState.yBreak);
-
-        ImagePattern pattern = new ImagePattern(new Image("block.jpg"));
-
-        rect.setFill(pattern);
-    }
-
     private void resetCollideFlags() {
-
         gameState.collideToBreak = false;
-
         gameState.collideToBreakAndMoveToRight = false;
-
         gameState.collideToRightWall = false;
-
         gameState.collideToLeftWall = false;
-
-
         gameState.collideToRightBlock = false;
-
         gameState.collideToBottomBlock = false;
-
         gameState.collideToLeftBlock = false;
-
         gameState.collideToTopBlock = false;
     }
 
@@ -438,7 +401,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         if (gameState.collideToBottomBlock) {
             gameState.goDownBall = true;
         }
-
     }
 
 
@@ -462,7 +424,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
                 // Create the File object
                 File file = new File(savePath);
-
 
                 // Print debug information
                 System.out.println("Directory exists: " + file.getParentFile().exists());
@@ -534,9 +495,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }).start();
     }
-
-
-
 
     private void loadGame() {
 
@@ -632,8 +590,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }).start();
     }
 
-
-
     private void nextLevel() {
         System.out.println("Entering next level");
         Platform.runLater(() -> {
@@ -700,7 +656,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onUpdate() {
@@ -856,9 +811,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
             choco.y += ((gameState.time - choco.timeCreated) / 1000.000) + 1.000;
         }
-
         //System.out.println("time is:" + time + " goldTime is " + goldTime);
-
     }
 
 
