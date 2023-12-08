@@ -45,6 +45,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     public boolean isGoldStatus = false;
     public boolean isSizeBoost = false;
+    public boolean isPaddleSmall = false;
     private boolean isExistHeartBlock = false;
 
     public boolean isPaused = false;
@@ -62,6 +63,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private long hitTime = 0;
     private long goldTime = 0;
     private long sizeBoostTime = 0;
+    private long paddleSmalltime = 0;
 
     private GameEngine engine;
 
@@ -308,11 +310,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 } else if (r % 10 == 2 && !isExistHeartBlock) {
                     type = Block.BLOCK_HEART;
                     isExistHeartBlock = true;
-                } else if (r % 10 == 3) {
+                } else if (r % 10 == 5) {
                     type = Block.BLOCK_STAR;
                 } else if (r % 10 == 4) {
                     type = Block.BLOCK_SIZEBOOST;
-                } else {
+                } else if (r % 10 == 3) {
+                    type = Block.BLOCK_PADDLESMALL;
+                }else {
                     type = Block.BLOCK_NORMAL;
                 }
 
@@ -432,8 +436,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private boolean collideToLeftBlock = false;
     private boolean collideToTopBlock = false;
 
-    private double vX = 1.500;
-    private double vY = 1.500;
+    private double vX = 2.000;
+    private double vY = 2.000;
 
 
     private void resetCollideFlags() {
@@ -474,6 +478,19 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 ballRadius = 10; // Set it back to the normal radius
             }
             ball.setRadius(ballRadius); // Update the ball's radius
+        });
+
+        // Adjust the paddle's appearance for Small paddle condition
+        Platform.runLater(() -> {
+            if (isPaddleSmall) {
+                breakHeight = 20;
+                breakWidth = 65;
+            } else {
+                breakHeight = 30;
+                breakWidth = 130;
+            }
+            rect.setWidth(breakWidth);
+            rect.setHeight(breakHeight);
         });
 
         if (yBall <= 0) {
@@ -781,12 +798,14 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 isGoldStatus = false;
                 isExistHeartBlock = false;
                 isSizeBoost = false;
+                isPaddleSmall = false;
 
 
                 hitTime = 0;
                 time = 0;
                 goldTime = 0;
                 sizeBoostTime = 0;
+                paddleSmalltime = 0;
 
                 //engine.stop();
                 blocks.clear();
@@ -814,10 +833,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             isSizeBoost = false;
             isGoldStatus = false;
             isExistHeartBlock = false;
+            isPaddleSmall =false;
             hitTime = 0;
             time = 0;
             goldTime = 0;
             sizeBoostTime = 0;
+            paddleSmalltime = 0;
 
             blocks.clear();
             chocos.clear();
@@ -867,6 +888,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                         destroyedBlockCount++;
                         //System.out.println("size is " + blocks.size());
                         resetCollideFlags();
+
+                        if (block.type == Block.BLOCK_PADDLESMALL) {
+                            System.out.println("Small Paddle");
+                            paddleSmalltime = time;
+                            isPaddleSmall = true;
+                        }
 
                         if (block.type == Block.BLOCK_SIZEBOOST) {
                             System.out.println("Size Boost");
@@ -949,6 +976,20 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 // Revert the ball's appearance to normal
                 Platform.runLater(() -> {
                     ball.setFill(new ImagePattern(new Image("ball.png")));
+                });
+            }
+        }
+
+        if (isPaddleSmall) {
+            if (time - paddleSmalltime > 5000) {
+                isPaddleSmall = false;
+                System.out.println("Paddle Small Ended");
+
+                breakHeight = 30;
+                breakWidth = 130;
+
+                Platform.runLater(() -> {
+                    rect.setFill(new ImagePattern(new Image("block.jpg")));
                 });
             }
         }

@@ -41,6 +41,7 @@ public class Block implements Serializable {
     public static int BLOCK_STAR = 101;
     public static int BLOCK_HEART = 102;
     public static int BLOCK_SIZEBOOST = 103;
+    public static  int BLOCK_PADDLESMALL = 104;
 
     public static double buffer = 3; // Adjust this buffer as needed
     public Block(int row, int column, Color color, int type) {
@@ -75,6 +76,10 @@ public class Block implements Serializable {
             ImagePattern pattern = new ImagePattern(image);
             rect.setFill(pattern);
         } else if(type == BLOCK_SIZEBOOST) {
+            Image image = new Image("star.jpg");
+            ImagePattern pattern = new ImagePattern(image);
+            rect.setFill(pattern);
+        } else if(type == BLOCK_PADDLESMALL) {
             Image image = new Image("star.jpg");
             ImagePattern pattern = new ImagePattern(image);
             rect.setFill(pattern);
