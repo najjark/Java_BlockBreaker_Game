@@ -90,18 +90,18 @@ public class Block implements Serializable {
     }
 
 
-    public int checkHitToBlock(double xBall, double yBall) {
+    public int checkHitToBlock(double xBall, double yBall, CreateBall ball) {
 
         if (isDestroyed) {
             return NO_HIT;
         }
 
-        if (yBall >= y && yBall <= y + height + Main.ballRadius && xBall >= x + width - buffer && xBall <= x + width + buffer) {
+        if (yBall >= y && yBall <= y + height + ball.getRadius() && xBall >= x + width - buffer && xBall <= x + width + buffer) {
             //System.out.println("Collision with right side of the block!");
             return HIT_RIGHT;
         }
 
-        if (yBall >= y && yBall <= y + height + Main.ballRadius && xBall >= x - buffer && xBall <= x + buffer) {
+        if (yBall >= y && yBall <= y + height +  ball.getRadius() && xBall >= x - buffer && xBall <= x + buffer) {
             //System.out.println("Collision with left side of the block!");
             return HIT_LEFT;
         }
@@ -117,13 +117,13 @@ public class Block implements Serializable {
             return HIT_TOP;
         } */
 
-        if (yBall >= y - Main.ballRadius - buffer && yBall <= y + buffer && xBall >= x && xBall <= x + width) {
+        if (yBall >= y -  ball.getRadius() - buffer && yBall <= y + buffer && xBall >= x && xBall <= x + width) {
             // System.out.println("Collision with top side of the block!");
             return HIT_TOP;
         }
 
-        if (yBall >= y + height - Main.ballRadius && yBall <= y + height + buffer && xBall >= x && xBall <= x + width) {
-        // System.out.println("Collision with bottom side of the block!");
+        if (yBall >= y + height -  ball.getRadius() && yBall <= y + height + buffer && xBall >= x && xBall <= x + width) {
+        System.out.println("Collision with bottom side of the block!");
         return HIT_BOTTOM;
         }
 

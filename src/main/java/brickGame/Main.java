@@ -21,50 +21,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
-
-
-    private int level = 0;
-
-    private double xBreak = 0.0f;
-    private double centerBreakX;
-    private double yBreak = 660.0f;
-
-    private int breakWidth = 130;
-    private int breakHeight = 30;
-    private int halfBreakWidth = breakWidth / 2;
-
-    private int sceneWidth = 500;
-    private int sceneHeight = 700;
-
+    GameState gameState = new GameState();
     private static int LEFT = 1;
     private static int RIGHT = 2;
 
-    private Circle ball;
-    private double xBall;
-    private double yBall;
-
-    public boolean isGoldStatus = false;
-    public boolean isSizeBoost = false;
-    public boolean isPaddleSmall = false;
-    private boolean isExistHeartBlock = false;
-
-    public boolean isPaused = false;
-
+    private CreateBall ball;
     private Rectangle rect;
-    public static int ballRadius = 10;
-
-    private int destroyedBlockCount = 0;
-
-    private double v = 1.000;
-
-    private int heart = 3;
-    private int score = 0;
-    private long time = 0;
-    private long hitTime = 0;
-    private long goldTime = 0;
-    private long sizeBoostTime = 0;
-    private long paddleSmalltime = 0;
-
     private GameEngine engine;
 
     //public static String savePath = "D:/save/save.mdds";
@@ -106,117 +68,23 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     Button newGame = null;
 
     @Override
-    /* public void start(Stage primaryStage) throws Exception {
-        this.primaryStage = primaryStage;
-
-
-        if (!loadFromSave) {
-            level++;
-            if (level > 1) {
-                new Score().showMessage("Level Up :)", this);
-            }
-            if (level == 4) {
-                new Score().showWin(this);
-                return;
-            }
-
-            //root = new Pane();
-
-            initBall();
-            initBreak();
-            initBoard();
-
-            load = new Button("Load Game");
-            newGame = new Button("Start New Game");
-            load.setTranslateX(220);
-            load.setTranslateY(300);
-            newGame.setTranslateX(220);
-            newGame.setTranslateY(340);
-
-        }
-
-
-        root = new Pane();
-        scoreLabel = new Label("Score: " + score);
-        levelLabel = new Label("Level: " + level);
-        levelLabel.setTranslateY(20);
-        heartLabel = new Label("Heart : " + heart);
-        heartLabel.setTranslateX(sceneWidth - 70);
-        if (!loadFromSave) {
-            root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame,load);
-        } else {
-            root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel);
-        }
-        for (Block block : blocks) {
-            root.getChildren().add(block.rect);
-        }
-        Scene scene = new Scene(root, sceneWidth, sceneHeight);
-        scene.getStylesheets().add("style.css");
-        scene.setOnKeyPressed(this);
-
-        primaryStage.setTitle("Game");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-        if (!loadFromSave) {
-            if (level > 1 && level < 4) {
-                //System.out.println("1");
-                load.setVisible(false);
-                newGame.setVisible(false);
-                engine = new GameEngine();
-                engine.setOnAction(this);
-                engine.setFps(120);
-                engine.start();
-            }
-
-            load.setOnAction(event -> {
-                loadGame();
-
-                load.setVisible(false);
-                newGame.setVisible(false);
-            });
-
-            newGame.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    engine = new GameEngine();
-                    engine.setOnAction(Main.this);
-                    engine.setFps(120);
-                    engine.start();
-
-                    load.setVisible(false);
-                    newGame.setVisible(false);
-                }
-            });
-        } else {
-            engine = new GameEngine();
-            engine.setOnAction(this);
-            engine.setFps(120);
-            engine.start();
-            loadFromSave = false;
-        }
-
-
-    } */
-
-
     public void start(Stage primaryStage) {
         try {
             this.primaryStage = primaryStage;
 
             if (!loadFromSave) {
-                level++;
-                if (level > 1) {
+                gameState.level++;
+                if (gameState.level > 1) {
                     new Score().showMessage("Level Up :)", this);
                 }
-                if (level == 4) {
+                if (gameState.level == 4) {
                     new Score().showWin(this);
                     return;
                 }
 
                 root = new Pane();
 
-                initBall();
+                ball = new CreateBall();
                 initBreak();
                 initBoard();
 
@@ -229,11 +97,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
 
             root = new Pane();
-            scoreLabel = new Label("Score: " + score);
-            levelLabel = new Label("Level: " + level);
+            scoreLabel = new Label("Score: " + gameState.score);
+            levelLabel = new Label("Level: " + gameState.level);
             levelLabel.setTranslateY(20);
-            heartLabel = new Label("Heart : " + heart);
-            heartLabel.setTranslateX(sceneWidth - 70);
+            heartLabel = new Label("Heart : " + gameState.heart);
+            heartLabel.setTranslateX(gameState.sceneWidth - 70);
 
             if (!loadFromSave) {
                 root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel, newGame, load);
@@ -245,7 +113,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 root.getChildren().add(block.rect);
             }
 
-            Scene scene = new Scene(root, sceneWidth, sceneHeight);
+            Scene scene = new Scene(root, gameState.sceneWidth, gameState.sceneHeight);
             scene.getStylesheets().add("style.css");
             scene.setOnKeyPressed(this);
 
@@ -254,7 +122,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             primaryStage.show();
 
             if (!loadFromSave) {
-                if (level > 1 && level < 4) {
+                if (gameState.level > 1 && gameState.level < 4) {
                     load.setVisible(false);
                     newGame.setVisible(false);
                     engine = new GameEngine();
@@ -300,16 +168,16 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         Random random = new Random();  // Move Random instance outside the loop
 
         for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < level + 1; j++) {
+            for (int j = 0; j < gameState.level + 1; j++) {
                 int r = random.nextInt(500);
 
                 // Adjusted conditions to ensure better block distribution
                 int type;
                 if (r % 10 == 1) {
                     type = Block.BLOCK_CHOCO;
-                } else if (r % 10 == 2 && !isExistHeartBlock) {
+                } else if (r % 10 == 2 && !gameState.isExistHeartBlock) {
                     type = Block.BLOCK_HEART;
-                    isExistHeartBlock = true;
+                    gameState.isExistHeartBlock = true;
                 } else if (r % 10 == 5) {
                     type = Block.BLOCK_STAR;
                 } else if (r % 10 == 4) {
@@ -354,9 +222,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void pauseGame() {
-        isPaused = !isPaused;
+        gameState.isPaused = !gameState.isPaused;
 
-        if (isPaused) {
+        if (gameState.isPaused) {
             engine.stop();
         } else {
             engine.start();
@@ -371,18 +239,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             public void run() {
                 int sleepTime = 4;
                 for (int i = 0; i < 30; i++) {
-                    if (xBreak == (sceneWidth - breakWidth) && direction == RIGHT) {
+                    if (gameState.xBreak == (gameState.sceneWidth - gameState.breakWidth) && direction == RIGHT) {
                         return;
                     }
-                    if (xBreak == 0 && direction == LEFT) {
+                    if (gameState.xBreak == 0 && direction == LEFT) {
                         return;
                     }
                     if (direction == RIGHT) {
-                        xBreak++;
+                        gameState.xBreak++;
                     } else {
-                        xBreak--;
+                        gameState.xBreak--;
                     }
-                    centerBreakX = xBreak + halfBreakWidth;
+                    gameState.centerBreakX = gameState.xBreak + gameState.halfBreakWidth;
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
@@ -398,115 +266,96 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     }
 
-
-    private void initBall() {
-        //Random random = new Random();
-        xBall = sceneWidth / 2.0;  // Set x-coordinate to the center of the scene
-        yBall = yBreak - 100;
-        ball = new Circle();
-        ball.setRadius(ballRadius);
-        ball.setFill(new ImagePattern(new Image("ball.png")));
-    }
-
     private void initBreak() {
         rect = new Rectangle();
-        rect.setWidth(breakWidth);
-        rect.setHeight(breakHeight);
+        rect.setWidth(gameState.breakWidth);
+        rect.setHeight(gameState.breakHeight);
 
         // Set x-coordinate to the center of the scene
-        xBreak = (sceneWidth - breakWidth) / 2.0;
+        gameState.xBreak = (gameState.sceneWidth - gameState.breakWidth) / 2.0;
 
-        rect.setX(xBreak);
-        rect.setY(yBreak);
+        rect.setX(gameState.xBreak);
+        rect.setY(gameState.yBreak);
 
         ImagePattern pattern = new ImagePattern(new Image("block.jpg"));
 
         rect.setFill(pattern);
     }
 
-
-    private boolean goDownBall = true;
-    private boolean goRightBall = true;
-    private boolean collideToBreak = false;
-    private boolean collideToBreakAndMoveToRight = true;
-    private boolean collideToRightWall = false;
-    private boolean collideToLeftWall = false;
-    private boolean collideToRightBlock = false;
-    private boolean collideToBottomBlock = false;
-    private boolean collideToLeftBlock = false;
-    private boolean collideToTopBlock = false;
-
-    private double vX = 2.000;
-    private double vY = 2.000;
-
-
     private void resetCollideFlags() {
 
-        collideToBreak = false;
-        collideToBreakAndMoveToRight = false;
-        collideToRightWall = false;
-        collideToLeftWall = false;
+        gameState.collideToBreak = false;
 
-        collideToRightBlock = false;
-        collideToBottomBlock = false;
-        collideToLeftBlock = false;
-        collideToTopBlock = false;
+        gameState.collideToBreakAndMoveToRight = false;
+
+        gameState.collideToRightWall = false;
+
+        gameState.collideToLeftWall = false;
+
+
+        gameState.collideToRightBlock = false;
+
+        gameState.collideToBottomBlock = false;
+
+        gameState.collideToLeftBlock = false;
+
+        gameState.collideToTopBlock = false;
     }
 
     private void setPhysicsToBall() {
-        v = ((time - hitTime) / 1000.000) + 1.000;
+        gameState.v = ((gameState.time - gameState.hitTime) / 1000.000) + 1.000;
 
-        if (goDownBall) {
-            yBall += vY;
+        if (gameState.goDownBall) {
+            gameState.yBall += gameState.vY;
         } else {
-            yBall -= vY;
+            gameState.yBall -= gameState.vY;
         }
 
-        if (goRightBall) {
-            xBall += vX;
+        if (gameState.goRightBall) {
+            gameState.xBall += gameState.vX;
         } else {
-            xBall -= vX;
+            gameState.xBall -= gameState.vX;
         }
 
 
         // Adjust the ball's appearance for the size boost
         Platform.runLater(() -> {
-            if (isSizeBoost) {
-                ballRadius = 20; // Adjust the radius for the boost
-                Block.buffer = 20;
+            if (gameState.isSizeBoost) {
+                gameState.ballRadius = 18; // Adjust the radius for the boost
+                Block.buffer = 12;
             } else {
-                ballRadius = 10; // Set it back to the normal radius
+                gameState.ballRadius = 10; // Set it back to the normal radius
             }
-            ball.setRadius(ballRadius); // Update the ball's radius
+            ball.setRadius(gameState.ballRadius); // Update the ball's radius
         });
 
         // Adjust the paddle's appearance for Small paddle condition
         Platform.runLater(() -> {
-            if (isPaddleSmall) {
-                breakHeight = 20;
-                breakWidth = 65;
+            if (gameState.isPaddleSmall) {
+                gameState.breakHeight = 20;
+                gameState.breakWidth = 65;
             } else {
-                breakHeight = 30;
-                breakWidth = 130;
+                gameState.breakHeight = 30;
+                gameState.breakWidth = 130;
             }
-            rect.setWidth(breakWidth);
-            rect.setHeight(breakHeight);
+            rect.setWidth(gameState.breakWidth);
+            rect.setHeight(gameState.breakHeight);
         });
 
-        if (yBall <= 0) {
+        if (gameState.yBall <= 0) {
             //vX = 1.000;
             resetCollideFlags();
-            goDownBall = true;
+            gameState.goDownBall = true;
             return; // handles collision with the top of the screen
         }
-        if (yBall >= sceneHeight) { // handles collision with the bottom of the screen
-            goDownBall = false;
-            if (!isGoldStatus) { // this if condition only runs if the ball is not gold
+        if (gameState.yBall >= gameState.sceneHeight) { // handles collision with the bottom of the screen
+            gameState.goDownBall = false;
+            if (!gameState.isGoldStatus) { // this if condition only runs if the ball is not gold
                 //TODO gameover
-                heart--;
-                new Score().show(sceneWidth / 2, sceneHeight / 2, -1, this);
+                gameState.heart--;
+                new Score().show(gameState.sceneWidth / 2, gameState.sceneHeight / 2, -1, this);
 
-                if (heart == 0) { // if condition for game over
+                if (gameState.heart == 0) { // if condition for game over
                     new Score().showGameOver(this);
                     engine.stop();
                 }
@@ -515,57 +364,57 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             return;
         }
 
-        if (yBall >= yBreak - ballRadius) { // checks if ball has the same y-axis value as the platform
+        if (gameState.yBall >= gameState.yBreak - gameState.ballRadius) { // checks if ball has the same y-axis value as the platform
             //System.out.println("Collide1");
-            if (xBall >= xBreak && xBall <= xBreak + breakWidth) { // checks if the ball hits the platform
-                hitTime = time;
+            if (gameState.xBall >= gameState.xBreak && gameState.xBall <= gameState.xBreak + gameState.breakWidth) { // checks if the ball hits the platform
+                gameState.hitTime = gameState.time;
                 resetCollideFlags();
-                collideToBreak = true;
-                goDownBall = false;
+                gameState.collideToBreak = true;
+                gameState.goDownBall = false;
 
-                double relation = (xBall - centerBreakX) / (breakWidth / 2);
+                double relation = (gameState.xBall - gameState.centerBreakX) / (gameState.breakWidth / 2);
 
                 if (Math.abs(relation) <= 0.3) { // condition responsible for how the ball bounces off of the platform
                     //vX = 0;
-                    vX = Math.abs(relation);
+                    gameState.vX = Math.abs(relation);
                 } else if (Math.abs(relation) > 0.3 && Math.abs(relation) <= 0.7) {
-                    vX = (Math.abs(relation) * 1.5) + (level / 3.500);
+                    gameState.vX = (Math.abs(relation) * 1.5) + (gameState.level / 3.500);
                     //System.out.println("vX " + vX);
                 } else {
-                    vX = (Math.abs(relation) * 2) + (level / 3.500);
+                    gameState.vX = (Math.abs(relation) * 2) + (gameState.level / 3.500);
                     //System.out.println("vX " + vX);
                 }
 
-                if (xBall - centerBreakX > 0) { // makes ball go right if hit right side of platform when coming from right
-                    collideToBreakAndMoveToRight = true;
+                if (gameState.xBall - gameState.centerBreakX > 0) { // makes ball go right if hit right side of platform when coming from right
+                    gameState.collideToBreakAndMoveToRight = true;
                 } else { // same but for left
-                    collideToBreakAndMoveToRight = false;
+                    gameState.collideToBreakAndMoveToRight = false;
                 }
                 //System.out.println("Collide2");
             }
         }
 
-        if (xBall >= sceneWidth) { // handles ball collision with right side of screen
+        if (gameState.xBall >= gameState.sceneWidth) { // handles ball collision with right side of screen
             resetCollideFlags();
             //vX = 1.000;
             //collideToRightWall = true;
-            goRightBall = false;
+            gameState.goRightBall = false;
             return;
         }
 
-        if (xBall <= 0) { // handles ball collision with left side of screen
+        if (gameState.xBall <= 0) { // handles ball collision with left side of screen
             resetCollideFlags();
             //vX = 1.000;
             //collideToLeftWall = true;
-            goRightBall = true;
+            gameState.goRightBall = true;
             return;
         }
 
-        if (collideToBreak) { // same as line 382
-            if (collideToBreakAndMoveToRight) {
-                goRightBall = true;
+        if (gameState.collideToBreak) { // same as line 382
+            if (gameState.collideToBreakAndMoveToRight) {
+                gameState.goRightBall = true;
             } else {
-                goRightBall = false;
+                gameState.goRightBall = false;
             }
             return;
         }
@@ -574,27 +423,27 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
         //Block Collide
 
-        if (collideToRightBlock) { // handles collision with each side of blocks
-            goRightBall = true;
+        if (gameState.collideToRightBlock) { // handles collision with each side of blocks
+            gameState.goRightBall = true;
         }
 
-        if (collideToLeftBlock) {
-            goRightBall = false;
+        if (gameState.collideToLeftBlock) {
+            gameState.goRightBall = false;
         }
 
-        if (collideToTopBlock) {
-            goDownBall = false;
+        if (gameState.collideToTopBlock) {
+            gameState.goDownBall = false;
         }
 
-        if (collideToBottomBlock) {
-            goDownBall = true;
+        if (gameState.collideToBottomBlock) {
+            gameState.goDownBall = true;
         }
 
     }
 
 
     private void checkDestroyedCount() {
-        if (destroyedBlockCount == blocks.size()) {
+        if (gameState.destroyedBlockCount == blocks.size()) {
             //TODO win level todo...
             //System.out.println("You Win");
 
@@ -635,32 +484,32 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 // Add the try-catch block for file creation
                 try {
                     ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-                    outputStream.writeInt(level);
-                    outputStream.writeInt(score);
-                    outputStream.writeInt(heart);
-                    outputStream.writeInt(destroyedBlockCount);
-                    outputStream.writeDouble(xBall);
-                    outputStream.writeDouble(yBall);
-                    outputStream.writeDouble(xBreak);
-                    outputStream.writeDouble(yBreak);
-                    outputStream.writeDouble(centerBreakX);
-                    outputStream.writeLong(time);
-                    outputStream.writeLong(goldTime);
-                    outputStream.writeDouble(vX);
-                    outputStream.writeBoolean(isExistHeartBlock);
-                    outputStream.writeBoolean(isGoldStatus);
-                    outputStream.writeBoolean(isSizeBoost);
-                    outputStream.writeLong(sizeBoostTime);
-                    outputStream.writeBoolean(goDownBall);
-                    outputStream.writeBoolean(goRightBall);
-                    outputStream.writeBoolean(collideToBreak);
-                    outputStream.writeBoolean(collideToBreakAndMoveToRight);
-                    outputStream.writeBoolean(collideToRightWall);
-                    outputStream.writeBoolean(collideToLeftWall);
-                    outputStream.writeBoolean(collideToRightBlock);
-                    outputStream.writeBoolean(collideToBottomBlock);
-                    outputStream.writeBoolean(collideToLeftBlock);
-                    outputStream.writeBoolean(collideToTopBlock);
+                    outputStream.writeInt(gameState.level);
+                    outputStream.writeInt(gameState.score);
+                    outputStream.writeInt(gameState.heart);
+                    outputStream.writeInt(gameState.destroyedBlockCount);
+                    outputStream.writeDouble(gameState.xBall);
+                    outputStream.writeDouble(gameState.yBall);
+                    outputStream.writeDouble(gameState.xBreak);
+                    outputStream.writeDouble(gameState.yBreak);
+                    outputStream.writeDouble(gameState.centerBreakX);
+                    outputStream.writeLong(gameState.time);
+                    outputStream.writeLong(gameState.goldTime);
+                    outputStream.writeDouble(gameState.vX);
+                    outputStream.writeBoolean(gameState.isExistHeartBlock);
+                    outputStream.writeBoolean(gameState.isGoldStatus);
+                    outputStream.writeBoolean(gameState.isSizeBoost);
+                    outputStream.writeLong(gameState.sizeBoostTime);
+                    outputStream.writeBoolean(gameState.goDownBall);
+                    outputStream.writeBoolean(gameState.goRightBall);
+                    outputStream.writeBoolean(gameState.collideToBreak);
+                    outputStream.writeBoolean(gameState.collideToBreakAndMoveToRight);
+                    outputStream.writeBoolean(gameState.collideToRightWall);
+                    outputStream.writeBoolean(gameState.collideToLeftWall);
+                    outputStream.writeBoolean(gameState.collideToRightBlock);
+                    outputStream.writeBoolean(gameState.collideToBottomBlock);
+                    outputStream.writeBoolean(gameState.collideToLeftBlock);
+                    outputStream.writeBoolean(gameState.collideToTopBlock);
 
                     ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
                     for (Block block : blocks) {
@@ -717,38 +566,38 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 // Add the try-catch block for file reading
                 try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file))) {
                     // Read the game state
-                    level = inputStream.readInt();
-                    score = inputStream.readInt();
-                    heart = inputStream.readInt();
-                    destroyedBlockCount = inputStream.readInt();
-                    xBall = inputStream.readDouble();
-                    yBall = inputStream.readDouble();
-                    xBreak = inputStream.readDouble();
-                    yBreak = inputStream.readDouble();
-                    centerBreakX = inputStream.readDouble();
-                    time = inputStream.readLong();
-                    goldTime = inputStream.readLong();
-                    sizeBoostTime = inputStream.readLong();
-                    isSizeBoost = inputStream.readBoolean();
-                    vX = inputStream.readDouble();
-                    isExistHeartBlock = inputStream.readBoolean();
-                    isGoldStatus = inputStream.readBoolean();
-                    goDownBall = inputStream.readBoolean();
-                    goRightBall = inputStream.readBoolean();
-                    collideToBreak = inputStream.readBoolean();
-                    collideToBreakAndMoveToRight = inputStream.readBoolean();
-                    collideToRightWall = inputStream.readBoolean();
-                    collideToLeftWall = inputStream.readBoolean();
-                    collideToRightBlock = inputStream.readBoolean();
-                    collideToBottomBlock = inputStream.readBoolean();
-                    collideToLeftBlock = inputStream.readBoolean();
-                    collideToTopBlock = inputStream.readBoolean();
+                    gameState.level = inputStream.readInt();
+                    gameState.score = inputStream.readInt();
+                    gameState.heart = inputStream.readInt();
+                    gameState.destroyedBlockCount = inputStream.readInt();
+                    gameState.xBall = inputStream.readDouble();
+                    gameState.yBall = inputStream.readDouble();
+                    gameState.xBreak = inputStream.readDouble();
+                    gameState.yBreak = inputStream.readDouble();
+                    gameState.centerBreakX = inputStream.readDouble();
+                    gameState.time = inputStream.readLong();
+                    gameState.goldTime = inputStream.readLong();
+                    gameState.sizeBoostTime = inputStream.readLong();
+                    gameState.isSizeBoost = inputStream.readBoolean();
+                    gameState.vX = inputStream.readDouble();
+                    gameState.isExistHeartBlock = inputStream.readBoolean();
+                    gameState.isGoldStatus = inputStream.readBoolean();
+                    gameState.goDownBall = inputStream.readBoolean();
+                    gameState.goRightBall = inputStream.readBoolean();
+                    gameState.collideToBreak = inputStream.readBoolean();
+                    gameState.collideToBreakAndMoveToRight = inputStream.readBoolean();
+                    gameState.collideToRightWall = inputStream.readBoolean();
+                    gameState.collideToLeftWall = inputStream.readBoolean();
+                    gameState.collideToRightBlock = inputStream.readBoolean();
+                    gameState.collideToBottomBlock = inputStream.readBoolean();
+                    gameState.collideToLeftBlock = inputStream.readBoolean();
+                    gameState.collideToTopBlock = inputStream.readBoolean();
 
                     // Print loaded values
-                    System.out.println("Loaded Level: " + level);
-                    System.out.println("Loaded Score: " + score);
-                    System.out.println("Loaded Heart: " + heart);
-                    System.out.println("Loaded Destroyed Block Count: " + destroyedBlockCount);
+                    System.out.println("Loaded Level: " + gameState.level);
+                    System.out.println("Loaded Score: " + gameState.score);
+                    System.out.println("Loaded Heart: " + gameState.heart);
+                    System.out.println("Loaded Destroyed Block Count: " + gameState.destroyedBlockCount);
 
                     ArrayList<BlockSerializable> blockSerializables = (ArrayList<BlockSerializable>) inputStream.readObject();
 
@@ -789,28 +638,31 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         System.out.println("Entering next level");
         Platform.runLater(() -> {
             try {
-                vX = 1.000;
+                gameState.vX = 1.000;
 
                 engine.stop();
                 resetCollideFlags();
-                goDownBall = true;
+                gameState.goDownBall = true;
 
-                isGoldStatus = false;
-                isExistHeartBlock = false;
-                isSizeBoost = false;
-                isPaddleSmall = false;
+                gameState.isGoldStatus = false;
+                gameState.isExistHeartBlock = false;
+                gameState.isSizeBoost = false;
+                gameState.isPaddleSmall = false;
 
 
-                hitTime = 0;
-                time = 0;
-                goldTime = 0;
-                sizeBoostTime = 0;
-                paddleSmalltime = 0;
+                gameState.hitTime = 0;
+                gameState.time = 0;
+                gameState.goldTime = 0;
+                gameState.sizeBoostTime = 0;
+                gameState.paddleSmalltime = 0;
+
+                gameState.yBall = 500.0f;
+                gameState.xBall = 250;
 
                 //engine.stop();
                 blocks.clear();
                 chocos.clear();
-                destroyedBlockCount = 0;
+                gameState.destroyedBlockCount = 0;
                 start(primaryStage);
 
             } catch (Exception e) {
@@ -822,23 +674,23 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public void restartGame() {
 
         try {
-            level = 0;
-            heart = 3;
-            score = 0;
-            vX = 1.000;
-            destroyedBlockCount = 0;
+            gameState.level = 0;
+            gameState.heart = 3;
+            gameState.score = 0;
+            gameState.vX = 1.000;
+            gameState.destroyedBlockCount = 0;
             resetCollideFlags();
-            goDownBall = true;
+            gameState.goDownBall = true;
 
-            isSizeBoost = false;
-            isGoldStatus = false;
-            isExistHeartBlock = false;
-            isPaddleSmall =false;
-            hitTime = 0;
-            time = 0;
-            goldTime = 0;
-            sizeBoostTime = 0;
-            paddleSmalltime = 0;
+            gameState.isSizeBoost = false;
+            gameState.isGoldStatus = false;
+            gameState.isExistHeartBlock = false;
+            gameState.isPaddleSmall =false;
+            gameState.hitTime = 0;
+            gameState.time = 0;
+            gameState.goldTime = 0;
+            gameState.sizeBoostTime = 0;
+            gameState.paddleSmalltime = 0;
 
             blocks.clear();
             chocos.clear();
@@ -854,13 +706,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public void onUpdate() {
         Platform.runLater(() -> {
 
-            scoreLabel.setText("Score: " + score);
-            heartLabel.setText("Heart : " + heart);
+            scoreLabel.setText("Score: " + gameState.score);
+            heartLabel.setText("Heart : " + gameState.heart);
 
-            rect.setX(xBreak);
-            rect.setY(yBreak);
-            ball.setCenterX(xBall);
-            ball.setCenterY(yBall);
+            rect.setX(gameState.xBreak);
+            rect.setY(gameState.yBreak);
+            ball.setCenterX(gameState.xBall);
+            ball.setCenterY(gameState.yBall);
 
             for (Bonus choco : chocos) {
                 choco.choco.setY(choco.y);
@@ -868,71 +720,71 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         });
 
 
-        if (yBall >= Block.getPaddingTop() && yBall <= (Block.getHeight() * (level + 1)) + Block.getPaddingTop()) {
+        if (gameState.yBall >= Block.getPaddingTop() && gameState.yBall <= (Block.getHeight() * (gameState.level + 1)) + Block.getPaddingTop()) {
             for (Block block : blocks) {
                 synchronized (blocks) {
-                    int hitCode = block.checkHitToBlock(xBall, yBall);
+                    int hitCode = block.checkHitToBlock(gameState.xBall, gameState.yBall, ball);
                     if (hitCode != Block.NO_HIT) {
 
                         // Adjusted scoring logic for gold ball
-                        if (isGoldStatus) {
-                            score += 2; // Reward two points for gold ball
+                        if (gameState.isGoldStatus) {
+                            gameState.score += 2; // Reward two points for gold ball
                         } else {
-                            score += 1;
+                            gameState.score += 1;
                         }
 
                         new Score().show(block.x, block.y, 1, this);
 
                         block.rect.setVisible(false);
                         block.isDestroyed = true;
-                        destroyedBlockCount++;
+                        gameState.destroyedBlockCount++;
                         //System.out.println("size is " + blocks.size());
                         resetCollideFlags();
 
                         if (block.type == Block.BLOCK_PADDLESMALL) {
                             System.out.println("Small Paddle");
-                            paddleSmalltime = time;
-                            isPaddleSmall = true;
+                            gameState.paddleSmalltime = gameState.time;
+                            gameState.isPaddleSmall = true;
                         }
 
                         if (block.type == Block.BLOCK_SIZEBOOST) {
                             System.out.println("Size Boost");
-                            sizeBoostTime = time;
-                            ballRadius = 20;
-                            isSizeBoost = true;
+                            gameState.sizeBoostTime = gameState.time;
+                            gameState.ballRadius = 20;
+                            gameState.isSizeBoost = true;
                         }
 
                         if (block.type == Block.BLOCK_CHOCO) {
                             final Bonus choco = new Bonus(block.row, block.column);
-                            choco.timeCreated = time;
+                            choco.timeCreated = gameState.time;
                             Platform.runLater(() -> root.getChildren().add(choco.choco));
                             chocos.add(choco);
                         }
 
                         if (block.type == Block.BLOCK_STAR) {
-                            goldTime = time;
+                            gameState.goldTime = gameState.time;
                             ball.setFill(new ImagePattern(new Image("goldball.png")));
                             System.out.println("gold ball");
                             root.getStyleClass().add("goldRoot");
-                            isGoldStatus = true;
+                            gameState.isGoldStatus = true;
                         }
 
                         if (block.type == Block.BLOCK_HEART) {
-                            heart++;
+                            gameState.heart++;
                         }
 
-                        if (isGoldStatus) { // allows gold ball to skip collision detection
+                        if (gameState.isGoldStatus) { // allows gold ball to skip collision detection
                             continue;
                         }
                         else {
                             if (hitCode == Block.HIT_RIGHT) {
-                                collideToRightBlock = true;
+                                gameState.collideToRightBlock = true;
                             } else if (hitCode == Block.HIT_BOTTOM) {
-                                collideToBottomBlock = true;
+                                gameState.collideToBottomBlock = true;
                             } else if (hitCode == Block.HIT_LEFT) {
-                                collideToLeftBlock = true;
+                                gameState.collideToLeftBlock = true;
                             } else if (hitCode == Block.HIT_TOP) {
-                                collideToTopBlock = true;
+                                gameState.collideToTopBlock = true;
                             }
                         }
                     }
@@ -952,24 +804,24 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     @Override
     public void onPhysicsUpdate() {
         checkDestroyedCount();
-        if (!isPaused) { // only updates physics if game is not paused
+        if (!gameState.isPaused) { // only updates physics if game is not paused
             setPhysicsToBall();
         }
 
 
-        if (time - goldTime > 5000) {
+        if (gameState.time - gameState.goldTime > 5000) {
             ball.setFill(new ImagePattern(new Image("ball.png")));
             root.getStyleClass().remove("goldRoot");
-            isGoldStatus = false;
+            gameState.isGoldStatus = false;
         }
 
-        if (isSizeBoost) {
-            if (time - sizeBoostTime > 5000) {
-                isSizeBoost = false;
+        if (gameState.isSizeBoost) {
+            if (gameState.time - gameState.sizeBoostTime > 5000) {
+                gameState.isSizeBoost = false;
                 System.out.println("Size Boost ended");
 
                 // Reset the ball's radius to its original size
-                ballRadius = 10;
+                gameState.ballRadius = 10;
 
                 Block.buffer = 3;
 
@@ -980,13 +832,13 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
 
-        if (isPaddleSmall) {
-            if (time - paddleSmalltime > 5000) {
-                isPaddleSmall = false;
+        if (gameState.isPaddleSmall) {
+            if (gameState.time - gameState.paddleSmalltime > 5000) {
+                gameState.isPaddleSmall = false;
                 System.out.println("Paddle Small Ended");
 
-                breakHeight = 30;
-                breakWidth = 130;
+                gameState.breakHeight = 30;
+                gameState.breakWidth = 130;
 
                 Platform.runLater(() -> {
                     rect.setFill(new ImagePattern(new Image("block.jpg")));
@@ -995,17 +847,14 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
 
         for (Bonus choco : chocos) {
-            /* if (choco.y > sceneHeight || choco.taken) {
-                continue;
-            } */
             if (!choco.taken && rect.intersects(choco.choco.getBoundsInParent())) { // condition for giving bonus points if it touches platform
                 System.out.println("You Got it and +3 score for you");
                 choco.taken = true;
                 choco.choco.setVisible(false);
-                score += 3;
+                gameState.score += 3;
                 new Score().show(choco.x, choco.y, 3, this);
             }
-            choco.y += ((time - choco.timeCreated) / 1000.000) + 1.000;
+            choco.y += ((gameState.time - choco.timeCreated) / 1000.000) + 1.000;
         }
 
         //System.out.println("time is:" + time + " goldTime is " + goldTime);
@@ -1015,6 +864,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     @Override
     public void onTime(long time) {
-        this.time = time;
+        this.gameState.time = time;
     }
 }

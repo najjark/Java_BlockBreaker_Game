@@ -10,6 +10,7 @@ import javafx.util.Duration;
 //import sun.plugin2.message.Message;
 
 public class Score {
+    GameState gameState = new GameState();
     public void show(final double x, final double y, int score, final Main main) {
         String sign;
         if (score >= 0) {
@@ -19,7 +20,7 @@ public class Score {
         }
 
         //Adjust the score for gold ball
-        if (main.isGoldStatus) {
+        if (gameState.isGoldStatus) {
             score = 2;
         }
 
