@@ -1,5 +1,8 @@
 package brickGame;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -13,9 +16,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
     GameState gameState = new GameState();
@@ -165,6 +169,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             case P:
                 pauseGame();
                 break;
+            case R:
+                restartGame();
+                break;
         }
     }
 
@@ -179,37 +186,25 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void move(final int direction) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int sleepTime = 4;
-                for (int i = 0; i < 30; i++) {
-                    if (gameState.xBreak == (gameState.sceneWidth - gameState.breakWidth) && direction == RIGHT) {
-                        return;
-                    }
-                    if (gameState.xBreak == 0 && direction == LEFT) {
-                        return;
-                    }
-                    if (direction == RIGHT) {
-                        gameState.xBreak++;
-                    } else {
-                        gameState.xBreak--;
-                    }
-                    gameState.centerBreakX = gameState.xBreak + gameState.halfBreakWidth;
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (i >= 20) {
-                        sleepTime = i;
-                    }
-                }
-            }
-        }).start();
+        int step = (direction == RIGHT) ? 30 : -30;
 
+        // Check if the new position is within bounds
+        double newX = gameState.xBreak + step;
+        if (newX >= 0 && newX <= gameState.sceneWidth - gameState.breakWidth) {
+            // Create a Timeline for smooth movement
+            Timeline timeline = new Timeline(
+                    new KeyFrame(Duration.seconds(0.1), event -> {
+                        gameState.xBreak = newX;
+                        rect.setX(gameState.xBreak);
+                    })
+            );
 
+            // Play the animation
+            timeline.play();
+        }
     }
+
+
 
     private void resetCollideFlags() {
         gameState.collideToBreak = false;
@@ -589,6 +584,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public void restartGame() {
 
         try {
+
+            // stop the existing game engine if it's running
+            if (engine != null) {
+                engine.stop();
+            }
+
             gameState.level = 0;
             gameState.heart = 3;
             gameState.score = 0;
@@ -609,6 +610,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
             board.gameState.blocks.clear();
             board.gameState.chocos.clear();
+
+            // remove existing nodes from the scene
+            root.getChildren().clear();
 
             start(primaryStage);
         } catch (Exception e) {

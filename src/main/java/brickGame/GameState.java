@@ -47,7 +47,7 @@ public class GameState {
     public double vY;
     public boolean isPaused;
 
-    public ArrayList<Block> blocks;
+    public final ArrayList<Block> blocks;
     public ArrayList<Bonus> chocos;
     public Color[] colors = new Color[] {
             Color.MAGENTA,
