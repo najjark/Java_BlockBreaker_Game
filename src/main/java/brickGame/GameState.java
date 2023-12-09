@@ -101,11 +101,10 @@ public class GameState {
         this.collideToBottomBlock = false;
         this.collideToLeftBlock = false;
         this.collideToTopBlock = false;
-        this.vX = 2.000;
-        this.vY = 2.000;
+        this.vX = 1.000;
+        this.vY = 1.700;
         this.score = 0;
         this.isPaused = false;
-
 
         blocks = new ArrayList<Block>();
         chocos = new ArrayList<Bonus>();
@@ -125,6 +124,17 @@ public class GameState {
                 Color.TAN,
         };
 
-
     }
+
+    public void resetCollideFlags() {
+        collideToBreak = false;
+        collideToBreakAndMoveToRight = false;
+        collideToRightWall = false;
+        collideToLeftWall = false;
+        collideToRightBlock = false;
+        collideToBottomBlock = false;
+        collideToLeftBlock = false;
+        collideToTopBlock = false;
+    }
+
 }
