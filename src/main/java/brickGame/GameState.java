@@ -101,8 +101,8 @@ public class GameState {
         this.collideToBottomBlock = false;
         this.collideToLeftBlock = false;
         this.collideToTopBlock = false;
-        this.vX = 1.000;
-        this.vY = 1.700;
+        this.vX = 0.800;
+        this.vY = 2.000;
         this.score = 0;
         this.isPaused = false;
 

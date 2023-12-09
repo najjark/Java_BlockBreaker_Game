@@ -1,9 +1,11 @@
 package brickGame;
 
 import javafx.application.Platform;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 
 public class PhysicsEngine {
-    GameState gameState = new GameState();
+    private GameState gameState;
     private CreateBall ball;
     private Paddle rect;
     private GameEngine engine;
@@ -27,6 +29,14 @@ public class PhysicsEngine {
 
         if (gameState.goRightBall) {
             gameState.xBall += gameState.vX;
+
+            // Limit the speed on the x-axis
+            double maxXSpeed = 3.0; // Adjust this value based on your preference
+            if (gameState.vX > maxXSpeed) {
+                gameState.vX = maxXSpeed;
+            }
+
+
         } else {
             gameState.xBall -= gameState.vX;
         }
@@ -69,7 +79,7 @@ public class PhysicsEngine {
             if (!gameState.isGoldStatus) { // this if condition only runs if the ball is not gold
                 //TODO gameover
                 gameState.heart--;
-                new Score().show(gameState.sceneWidth / 2, gameState.sceneHeight / 2, -1, this.main);
+                new Score().show(gameState.sceneWidth / 2.0, gameState.sceneHeight / 2.0, -1, main);
 
                 if (gameState.heart == 0) { // if condition for game over
                     new Score().showGameOver(this.main);
