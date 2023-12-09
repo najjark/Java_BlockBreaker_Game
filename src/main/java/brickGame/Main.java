@@ -2,7 +2,6 @@ package brickGame;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -186,21 +185,23 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     }
 
     private void move(final int direction) {
-        int step = (direction == RIGHT) ? 30 : -30;
+        if (!gameState.isPaused) {
+            int step = (direction == RIGHT) ? 30 : -30;
 
-        // Check if the new position is within bounds
-        double newX = gameState.xBreak + step;
-        if (newX >= 0 && newX <= gameState.sceneWidth - gameState.breakWidth) {
-            // Create a Timeline for smooth movement
-            Timeline timeline = new Timeline(
-                    new KeyFrame(Duration.seconds(0.1), event -> {
-                        gameState.xBreak = newX;
-                        rect.setX(gameState.xBreak);
-                    })
-            );
+            // Check if the new position is within bounds
+            double newX = gameState.xBreak + step;
+            if (newX >= 0 && newX <= gameState.sceneWidth - gameState.breakWidth) {
+                // Create a Timeline for smooth movement
+                Timeline timeline = new Timeline(
+                        new KeyFrame(Duration.seconds(0.1), event -> {
+                            gameState.xBreak = newX;
+                            rect.setX(gameState.xBreak);
+                        })
+                );
 
-            // Play the animation
-            timeline.play();
+                // Play the animation
+                timeline.play();
+            }
         }
     }
 
@@ -598,21 +599,30 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             resetCollideFlags();
             gameState.goDownBall = true;
 
-            gameState.isSizeBoost = false;
-            gameState.isGoldStatus = false;
             gameState.isExistHeartBlock = false;
             gameState.isPaddleSmall =false;
             gameState.hitTime = 0;
             gameState.time = 0;
-            gameState.goldTime = 0;
-            gameState.sizeBoostTime = 0;
             gameState.paddleSmalltime = 0;
+
+            // reset power-up-related variables
+            gameState.isSizeBoost = false;
+            gameState.isGoldStatus = false;
+            gameState.sizeBoostTime = 0;
+            gameState.goldTime = 0;
+            gameState.ballRadius = 10; // reset the ball's radius to its original size
+            // reset the pause flag
+            gameState.isPaused = false;
 
             board.gameState.blocks.clear();
             board.gameState.chocos.clear();
 
             // remove existing nodes from the scene
             root.getChildren().clear();
+
+            // reset the ball position to the spawn point
+            gameState.xBall = 250;
+            gameState.yBall = 500.0f;
 
             start(primaryStage);
         } catch (Exception e) {
