@@ -117,12 +117,12 @@ public class Block implements Serializable {
             return HIT_TOP;
         } */
 
-        if (yBall >= y -  ball.getRadius() - buffer && yBall <= y + buffer && xBall >= x && xBall <= x + width) {
+        if (yBall >= y - ball.getRadius() - buffer && yBall <= y + buffer && xBall >= x && xBall <= x + width) {
             // System.out.println("Collision with top side of the block!");
             return HIT_TOP;
         }
 
-        if (yBall >= y + height -  ball.getRadius() && yBall <= y + height + buffer && xBall >= x && xBall <= x + width) {
+        if (yBall >= y + height - ball.getRadius() && yBall <= y + height + buffer && xBall >= x && xBall <= x + width) {
         //System.out.println("Collision with bottom side of the block!");
         return HIT_BOTTOM;
         }

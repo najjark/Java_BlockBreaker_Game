@@ -1,7 +1,10 @@
 package brickGame;
 
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+
+import java.util.ArrayList;
 
 public class GameState {
 
@@ -44,6 +47,24 @@ public class GameState {
     public double vY;
     public boolean isPaused;
 
+    public ArrayList<Block> blocks;
+    public ArrayList<Bonus> chocos;
+    public Color[] colors = new Color[] {
+            Color.MAGENTA,
+            Color.RED,
+            Color.GOLD,
+            Color.CORAL,
+            Color.AQUA,
+            Color.VIOLET,
+            Color.GREENYELLOW,
+            Color.ORANGE,
+            Color.PINK,
+            Color.SLATEGREY,
+            Color.YELLOW,
+            Color.TOMATO,
+            Color.TAN
+    };
+
     public GameState() {
         this.heart = 3;
         this.score = 0;
@@ -80,10 +101,30 @@ public class GameState {
         this.collideToBottomBlock = false;
         this.collideToLeftBlock = false;
         this.collideToTopBlock = false;
-        this.vX = 1.500;
-        this.vY = 1.500;
+        this.vX = 2.000;
+        this.vY = 2.000;
         this.score = 0;
         this.isPaused = false;
+
+
+        blocks = new ArrayList<Block>();
+        chocos = new ArrayList<Bonus>();
+        colors = new Color[]{
+                Color.MAGENTA,
+                Color.RED,
+                Color.GOLD,
+                Color.CORAL,
+                Color.AQUA,
+                Color.VIOLET,
+                Color.GREENYELLOW,
+                Color.ORANGE,
+                Color.PINK,
+                Color.SLATEGREY,
+                Color.YELLOW,
+                Color.TOMATO,
+                Color.TAN,
+        };
+
 
     }
 }

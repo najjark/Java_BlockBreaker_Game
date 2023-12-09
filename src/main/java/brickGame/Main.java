@@ -23,6 +23,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private static int RIGHT = 2;
     private CreateBall ball;
     private Paddle rect;
+    private CreateBoard board;
+
     private GameEngine engine;
 
     //public static String savePath = "D:/save/save.mdds";
@@ -32,30 +34,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     //public static String savePathDir = "D:/save/";
 
-    private ArrayList<Block> blocks = new ArrayList<Block>();
-    private ArrayList<Bonus> chocos = new ArrayList<Bonus>();
-    private Color[] colors = new Color[]{
-            Color.MAGENTA,
-            Color.RED,
-            Color.GOLD,
-            Color.CORAL,
-            Color.AQUA,
-            Color.VIOLET,
-            Color.GREENYELLOW,
-            Color.ORANGE,
-            Color.PINK,
-            Color.SLATEGREY,
-            Color.YELLOW,
-            Color.TOMATO,
-            Color.TAN,
-    };
     public Pane root;
     private Label scoreLabel;
     private Label heartLabel;
     private Label levelLabel;
 
     //private Label pauseLabel;
-
     private boolean loadFromSave = false;
 
     Stage primaryStage;
@@ -80,7 +64,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 root = new Pane();
                 ball = new CreateBall();
                 rect = new Paddle();
-                initBoard();
+                board = new CreateBoard();
+
+                //initBoard();
 
                 load = new Button("Load Game");
                 newGame = new Button("Start New Game");
@@ -103,7 +89,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 root.getChildren().addAll(rect, ball, scoreLabel, heartLabel, levelLabel);
             }
 
-            for (Block block : blocks) {
+            for (Block block : board.gameState.blocks) {
                 root.getChildren().add(block.rect);
             }
 
@@ -153,35 +139,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void initBoard() {
-        Random random = new Random();  // Move Random instance outside the loop
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < gameState.level + 1; j++) {
-                int r = random.nextInt(500);
-
-                // Adjusted conditions to ensure better block distribution
-                int type;
-                if (r % 10 == 1) {
-                    type = Block.BLOCK_CHOCO;
-                } else if (r % 10 == 2 && !gameState.isExistHeartBlock) {
-                    type = Block.BLOCK_HEART;
-                    gameState.isExistHeartBlock = true;
-                } else if (r % 10 == 5) {
-                    type = Block.BLOCK_STAR;
-                } else if (r % 10 == 4) {
-                    type = Block.BLOCK_SIZEBOOST;
-                } else if (r % 10 == 3) {
-                    type = Block.BLOCK_PADDLESMALL;
-                }else {
-                    type = Block.BLOCK_NORMAL;
-                }
-
-                blocks.add(new Block(j, i, colors[r % colors.length], type));
-            }
         }
     }
 
@@ -284,10 +241,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         // Adjust the ball's appearance for the size boost
         Platform.runLater(() -> {
             if (gameState.isSizeBoost) {
-                gameState.ballRadius = 18; // Adjust the radius for the boost
-                Block.buffer = 12;
+                //gameState.ballRadius = 18; // Adjust the radius for the boost
+                ball.setRadius(15);
+                Block.buffer = 7;
             } else {
-                gameState.ballRadius = 10; // Set it back to the normal radius
+                //gameState.ballRadius = 10; // Set it back to the normal radius
+                ball.setRadius(10);
             }
             ball.setRadius(gameState.ballRadius); // Update the ball's radius
         });
@@ -405,7 +364,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
 
     private void checkDestroyedCount() {
-        if (gameState.destroyedBlockCount == blocks.size()) {
+        if (gameState.destroyedBlockCount == board.gameState.blocks.size()) {
             //TODO win level todo...
             //System.out.println("You Win");
 
@@ -473,7 +432,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                     outputStream.writeBoolean(gameState.collideToTopBlock);
 
                     ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
-                    for (Block block : blocks) {
+                    for (Block block : board.gameState.blocks) {
                         if (!block.isDestroyed) {
                             blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
                         }
@@ -559,18 +518,18 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
                     ArrayList<BlockSerializable> blockSerializables = (ArrayList<BlockSerializable>) inputStream.readObject();
 
-                    blocks.clear();
+                    board.gameState.blocks.clear();
 
                     // Update the blocks ArrayList with the deserialized data
                     for (BlockSerializable blockSerializable : blockSerializables) {
-                        Color color = colors[blockSerializable.type % colors.length]; // Use the type as an index to get a color from the colors array
+                        Color color = board.gameState.colors[blockSerializable.type % board.gameState.colors.length]; // Use the type as an index to get a color from the colors array
                         Block block = new Block(blockSerializable.row, blockSerializable.j, color, blockSerializable.type);
-                        blocks.add(block);
+                        board.gameState.blocks.add(block);
                     }
 
                     // Print the contents of the blocks list
-                    System.out.println("Number of Blocks after deserialization: " + blocks.size());
-                    for (Block block : blocks) {
+                    System.out.println("Number of Blocks after deserialization: " + board.gameState.blocks.size());
+                    for (Block block : board.gameState.blocks) {
                         System.out.println("Block: " + block);  // Assuming Block class has a meaningful toString method
                     }
 
@@ -616,8 +575,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 gameState.xBall = 250;
 
                 //engine.stop();
-                blocks.clear();
-                chocos.clear();
+                board.gameState.blocks.clear();
+                board.gameState.chocos.clear();
                 gameState.destroyedBlockCount = 0;
                 start(primaryStage);
 
@@ -648,8 +607,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             gameState.sizeBoostTime = 0;
             gameState.paddleSmalltime = 0;
 
-            blocks.clear();
-            chocos.clear();
+            board.gameState.blocks.clear();
+            board.gameState.chocos.clear();
 
             start(primaryStage);
         } catch (Exception e) {
@@ -669,15 +628,15 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             ball.setCenterX(gameState.xBall);
             ball.setCenterY(gameState.yBall);
 
-            for (Bonus choco : chocos) {
+            for (Bonus choco : board.gameState.chocos) {
                 choco.choco.setY(choco.y);
             }
         });
 
 
         if (gameState.yBall >= Block.getPaddingTop() && gameState.yBall <= (Block.getHeight() * (gameState.level + 1)) + Block.getPaddingTop()) {
-            for (Block block : blocks) {
-                synchronized (blocks) {
+            for (Block block : board.gameState.blocks) {
+                synchronized (board.gameState.blocks) {
                     int hitCode = block.checkHitToBlock(gameState.xBall, gameState.yBall, ball);
                     if (hitCode != Block.NO_HIT) {
 
@@ -713,7 +672,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                             final Bonus choco = new Bonus(block.row, block.column);
                             choco.timeCreated = gameState.time;
                             Platform.runLater(() -> root.getChildren().add(choco.choco));
-                            chocos.add(choco);
+                            board.gameState.chocos.add(choco);
                         }
 
                         if (block.type == Block.BLOCK_STAR) {
@@ -763,12 +722,12 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             setPhysicsToBall();
         }
 
-
         if (gameState.time - gameState.goldTime > 5000) {
-            ball.setFill(new ImagePattern(new Image("ball.png")));
-            root.getStyleClass().remove("goldRoot");
-            gameState.isGoldStatus = false;
+             gameState.isGoldStatus = false;
+             ball.setFill(new ImagePattern(new Image("ball.png")));
+             root.getStyleClass().remove("goldRoot");
         }
+
 
         if (gameState.isSizeBoost) {
             if (gameState.time - gameState.sizeBoostTime > 5000) {
@@ -777,6 +736,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
                 // Reset the ball's radius to its original size
                 gameState.ballRadius = 10;
+
+                //ball.setRadius(10);
 
                 Block.buffer = 3;
 
@@ -801,7 +762,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
 
-        for (Bonus choco : chocos) {
+        for (Bonus choco : board.gameState.chocos) {
             if (!choco.taken && rect.intersects(choco.choco.getBoundsInParent())) { // condition for giving bonus points if it touches platform
                 System.out.println("You Got it and +3 score for you");
                 choco.taken = true;
