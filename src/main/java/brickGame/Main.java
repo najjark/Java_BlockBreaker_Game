@@ -29,6 +29,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private CreateBoard board;
     private GameEngine engine;
     private PhysicsEngine physicsEngine;
+    private SaveGame saveGame = new SaveGame();
+
     //public static String savePath = "D:/save/save.mdds";
     // Define a constant for the save directory
     public static final String savePath = "C:/Users/Khalid/Desktop/BlockBreakerTest";
@@ -158,7 +160,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 //setPhysicsToBall();
                 break;
             case S:
-                saveGame();
+                saveGame.saveGame(this);
                 break;
             case P:
                 pauseGame();
@@ -207,89 +209,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
             nextLevel();
         }
-    }
-
-    private void saveGame() {
-        new Thread(() -> {
-            try {
-                // Specify the filename
-                String saveFileName = "GameSave";
-
-                // Construct the full save path
-                String savePath = Main.savePath + File.separator + saveFileName;
-
-                // Create the File object
-                File file = new File(savePath);
-
-                // Print debug information
-                System.out.println("Directory exists: " + file.getParentFile().exists());
-                System.out.println("Directory path: " + file.getParentFile().getAbsolutePath());
-                System.out.println("Full save path: " + savePath);
-                System.out.println("File exists: " + file.exists());
-                System.out.println("File path: " + file.getAbsolutePath());
-
-                // Check if the parent directory exists, create if not
-                if (!file.getParentFile().exists()) {
-                    if (file.getParentFile().mkdirs()) {
-                        System.out.println("Directory created: " + file.getParentFile().getAbsolutePath());
-                    } else {
-                        System.err.println("Failed to create directory: " + file.getParentFile().getAbsolutePath());
-                        return;
-                    }
-                }
-
-                // Add the try-catch block for file creation
-                try {
-                    ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-                    outputStream.writeInt(gameState.level);
-                    outputStream.writeInt(gameState.score);
-                    outputStream.writeInt(gameState.heart);
-                    outputStream.writeInt(gameState.destroyedBlockCount);
-                    outputStream.writeDouble(gameState.xBall);
-                    outputStream.writeDouble(gameState.yBall);
-                    outputStream.writeDouble(gameState.xBreak);
-                    outputStream.writeDouble(gameState.yBreak);
-                    outputStream.writeDouble(gameState.centerBreakX);
-                    outputStream.writeLong(gameState.time);
-                    outputStream.writeLong(gameState.goldTime);
-                    outputStream.writeDouble(gameState.vX);
-                    outputStream.writeBoolean(gameState.isExistHeartBlock);
-                    outputStream.writeBoolean(gameState.isGoldStatus);
-                    outputStream.writeBoolean(gameState.isSizeBoost);
-                    outputStream.writeLong(gameState.sizeBoostTime);
-                    outputStream.writeBoolean(gameState.goDownBall);
-                    outputStream.writeBoolean(gameState.goRightBall);
-                    outputStream.writeBoolean(gameState.collideToBreak);
-                    outputStream.writeBoolean(gameState.collideToBreakAndMoveToRight);
-                    outputStream.writeBoolean(gameState.collideToRightWall);
-                    outputStream.writeBoolean(gameState.collideToLeftWall);
-                    outputStream.writeBoolean(gameState.collideToRightBlock);
-                    outputStream.writeBoolean(gameState.collideToBottomBlock);
-                    outputStream.writeBoolean(gameState.collideToLeftBlock);
-                    outputStream.writeBoolean(gameState.collideToTopBlock);
-
-                    ArrayList<BlockSerializable> blockSerializables = new ArrayList<>();
-                    for (Block block : board.gameState.blocks) {
-                        if (!block.isDestroyed) {
-                            blockSerializables.add(new BlockSerializable(block.row, block.column, block.type));
-                        }
-                    }
-
-                    outputStream.writeObject(blockSerializables);
-
-                    new Score().showMessage("Game Saved", Main.this);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.err.println("Error during file creation: " + e.getMessage());
-                    return;
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Unexpected Exception: " + e.getMessage());
-            }
-        }).start();
     }
 
     private void loadGame() {
