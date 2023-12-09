@@ -8,7 +8,6 @@ public class GameEngine {
     private Thread updateThread;
     private Thread physicsThread;
     public boolean isStopped = true;
-
     public void setOnAction(OnAction onAction) {
         this.onAction = onAction;
     }

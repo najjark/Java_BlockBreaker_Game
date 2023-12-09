@@ -26,7 +26,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private static int RIGHT = 2;
     private CreateBall ball;
     private Paddle rect;
-    private CreateBoard board;
+    public CreateBoard board;
     private GameEngine engine;
     private PhysicsEngine physicsEngine;
     private SaveGame saveGame = new SaveGame();
@@ -36,8 +36,8 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     public static final String savePath = "C:/Users/Khalid/Desktop/BlockBreakerTest";
     //public static String savePathDir = "D:/save/";
     public Pane root;
-    private Label scoreLabel;
-    private Label heartLabel;
+    public Label scoreLabel;
+    public Label heartLabel;
     private Label levelLabel;
     //private Label pauseLabel;
     private boolean loadFromSave = false;
@@ -307,7 +307,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         System.out.println("Entering next level");
         Platform.runLater(() -> {
             try {
-                gameState.vX = 1.000;
+                gameState.vX = 0.800;
 
                 engine.stop();
                 gameState.resetCollideFlags();
@@ -352,7 +352,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             gameState.level = 0;
             gameState.heart = 3;
             gameState.score = 0;
-            gameState.vX = 1.000;
+            gameState.vX = 0.800;
             gameState.destroyedBlockCount = 0;
             gameState.resetCollideFlags();
             gameState.goDownBall = true;
@@ -480,7 +480,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         }
     }
-
 
     @Override
     public void onInit() {
