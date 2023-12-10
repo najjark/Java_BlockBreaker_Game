@@ -30,9 +30,15 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private GameEngine engine;
     private PhysicsEngine physicsEngine;
     private SaveGame saveGame = new SaveGame();
+    private RestartGame restartGame = new RestartGame();
+
+    public GameEngine getEngine() {
+        return engine;
+    }
 
     //public static String savePath = "D:/save/save.mdds";
     // Define a constant for the save directory
+
     public static final String savePath = "C:/Users/Khalid/Desktop/BlockBreakerTest";
     //public static String savePathDir = "D:/save/";
     public Pane root;
@@ -53,7 +59,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             rect = new Paddle();
             ball = new CreateBall();
 
-            physicsEngine = new PhysicsEngine(this,ball, rect);
+            physicsEngine = new PhysicsEngine(this,ball, rect, engine);
 
             if (!loadFromSave) {
                 gameState.level++;
@@ -166,7 +172,7 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 pauseGame();
                 break;
             case R:
-                restartGame();
+                restartGame.restartGame(this);
                 break;
         }
     }
@@ -338,54 +344,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 e.printStackTrace();
             }
         });
-    }
-
-    public void restartGame() {
-
-        try {
-
-            // stop the existing game engine if it's running
-            if (engine != null) {
-                engine.stop();
-            }
-
-            gameState.level = 0;
-            gameState.heart = 3;
-            gameState.score = 0;
-            gameState.vX = 0.800;
-            gameState.destroyedBlockCount = 0;
-            gameState.resetCollideFlags();
-            gameState.goDownBall = true;
-
-            gameState.isExistHeartBlock = false;
-            gameState.isPaddleSmall =false;
-            gameState.hitTime = 0;
-            gameState.time = 0;
-            gameState.paddleSmalltime = 0;
-
-            // reset power-up-related variables
-            gameState.isSizeBoost = false;
-            gameState.isGoldStatus = false;
-            gameState.sizeBoostTime = 0;
-            gameState.goldTime = 0;
-            gameState.ballRadius = 10; // reset the ball's radius to its original size
-            // reset the pause flag
-            gameState.isPaused = false;
-
-            board.gameState.blocks.clear();
-            board.gameState.chocos.clear();
-
-            // remove existing nodes from the scene
-            root.getChildren().clear();
-
-            // reset the ball position to the spawn point
-            gameState.xBall = 250;
-            gameState.yBall = 500.0f;
-
-            start(primaryStage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

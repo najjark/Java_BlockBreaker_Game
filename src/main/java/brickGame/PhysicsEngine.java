@@ -11,11 +11,12 @@ public class PhysicsEngine {
     private GameEngine engine;
     private final Main main;
 
-    public PhysicsEngine(Main main, CreateBall ball, Paddle rect) {
+    public PhysicsEngine(Main main, CreateBall ball, Paddle rect, GameEngine engine) {
         this.main = main;
         this.ball = ball;
         this.rect = rect;
         this.gameState = main.gameState;
+        this.engine = engine;
     }
 
     public void setPhysicsToBall() {

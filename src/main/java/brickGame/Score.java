@@ -11,6 +11,9 @@ import javafx.util.Duration;
 
 public class Score {
     GameState gameState = new GameState();
+    RestartGame restartGame = new RestartGame();
+    GameEngine engine = new GameEngine();
+    CreateBoard board = new CreateBoard();
     public void show(final double x, final double y, int score, final Main main) {
         String sign;
         if (score >= 0) {
@@ -70,7 +73,7 @@ public class Score {
             Button restart = new Button("Restart");
             restart.setTranslateX(220);
             restart.setTranslateY(300);
-            restart.setOnAction(event -> main.restartGame());
+            restart.setOnAction(event -> restartGame.restartGame(main));
 
             main.root.getChildren().addAll(label, restart);
 
@@ -89,7 +92,7 @@ public class Score {
             Button restart = new Button("Restart");
             restart.setTranslateX(220);
             restart.setTranslateY(300);
-            restart.setOnAction(event -> main.restartGame());
+            restart.setOnAction(event -> restartGame.restartGame(main));
 
             main.root.getChildren().addAll(pauselabel, restart);
 
