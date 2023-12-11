@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
+/**
+ * SaveGame class is responsible for saving the current state of the game
+ */
 public class SaveGame {
 
     private GameState gameState = new GameState();
@@ -14,6 +17,11 @@ public class SaveGame {
     public SaveGame() {
 
     }
+
+    /**
+     * saveGame method is used to save the current state of the game
+     * @param main method takes in an instance of main to get game values from it
+     */
     public void saveGame(Main main) {
         new Thread(() -> {
             try {

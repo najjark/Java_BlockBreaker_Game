@@ -1,12 +1,18 @@
 package brickGame;
 
+/**
+ * RestartGame class is responsible for resetting the game
+ */
 public class RestartGame {
 
     public RestartGame () {
 
     }
 
-    //private GameState gameState = new GameState();
+    /**
+     * restartGame method is responsible for restarting the game back to level 1
+     * @param main method takes in an instance of main to reset values to initial values
+     */
     public void restartGame(Main main) {
 
         try {

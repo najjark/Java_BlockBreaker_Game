@@ -2,6 +2,9 @@ package brickGame;
 
 import java.io.Serializable;
 
+/**
+ * BlockSerializable is used to serialize the game data
+ */
 public class BlockSerializable implements Serializable {
     public final int row;
     public final int j;

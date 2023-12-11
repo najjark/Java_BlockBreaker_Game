@@ -7,6 +7,9 @@ import javafx.scene.shape.Rectangle;
 import java.io.Serializable;
 import java.util.Random;
 
+/**
+ * Bonus class is responsible for creating bonuses that award points if collected
+ */
 public class Bonus implements Serializable {
     public Rectangle choco;
 
@@ -21,6 +24,9 @@ public class Bonus implements Serializable {
         draw();
     }
 
+    /**
+     * draw method is responsible for determining which image to choose for the bonus and for its size
+     */
     private void draw() {
         choco = new Rectangle();
         choco.setWidth(30);

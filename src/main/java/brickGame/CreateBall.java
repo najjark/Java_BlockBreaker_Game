@@ -4,6 +4,9 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
+/**
+ * CreateBall class is responsible for creating a ball and setting its spawn point
+ */
 public class CreateBall extends Circle {
     GameState gameState = new GameState();
     public CreateBall() {

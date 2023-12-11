@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+/**
+ * LoadGame class is used to load in the state of the game
+ */
 public class LoadGame {
 
     private GameState gameState = new GameState();
@@ -18,6 +21,10 @@ public class LoadGame {
 
     }
 
+    /**
+     * loadGame method loads in saved game state when load button is pressed
+     * @param main method takes in saved variables from main
+     */
     public void loadGame(Main main) {
 
         System.out.println("Load button clicked");

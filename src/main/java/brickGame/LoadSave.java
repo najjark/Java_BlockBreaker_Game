@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+/**
+ * LoadSave class is used to load in saved game values
+ */
 public class LoadSave {
     public boolean          isExistHeartBlock;
     public boolean          isGoldStauts;
@@ -72,11 +75,7 @@ public class LoadSave {
 
             try {
                 blocks = (ArrayList<BlockSerializable>) inputStream.readObject();
-            }  /* catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } */
-
-            catch (IOException | ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 System.out.println("Error during deserialization: " + e.getMessage());
                 e.printStackTrace();
             }

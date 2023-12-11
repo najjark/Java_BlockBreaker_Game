@@ -4,6 +4,10 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 
+/**
+ * PhysicsEngine class is responsible for controlling the direction which the ball goes, and how it bounces off the paddle and the walls,
+ * it also changes the ball's appearance when boosts are active
+ */
 public class PhysicsEngine {
     private GameState gameState;
     private CreateBall ball;
@@ -19,11 +23,21 @@ public class PhysicsEngine {
         this.engine = engine;
     }
 
+    /**
+     * setPhysicsToBall method is responsible for controlling the position and speed of the ball and how it reacts to collisions
+     */
     public void setPhysicsToBall() {
         gameState.v = ((gameState.time - gameState.hitTime) / 1000.000) + 1.000;
 
         if (gameState.goDownBall) {
             gameState.yBall += gameState.vY;
+
+            // Limit the speed on the y-axis
+            double maxYSpeed = 3.0; // Adjust this value based on your preference
+            if (gameState.vY > maxYSpeed) {
+                gameState.vY = maxYSpeed;
+            }
+
         } else {
             gameState.yBall -= gameState.vY;
         }
@@ -36,7 +50,6 @@ public class PhysicsEngine {
             if (gameState.vX > maxXSpeed) {
                 gameState.vX = maxXSpeed;
             }
-
 
         } else {
             gameState.xBall -= gameState.vX;

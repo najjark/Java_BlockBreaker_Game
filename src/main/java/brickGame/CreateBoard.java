@@ -2,6 +2,9 @@ package brickGame;
 
 import java.util.Random;
 
+/**
+ * CreateBoard class is responsible for controlling probabilities for each kind of block using a random number and for adding them to the blocks array
+ */
 public class CreateBoard {
 
     GameState gameState = new GameState();

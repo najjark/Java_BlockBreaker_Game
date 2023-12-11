@@ -12,14 +12,14 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.*;
-import java.util.ArrayList;
 
+/**
+ *  Main function is responsible for starting the game and updating physics upon collision and applying effects if a special block is destroyed
+ */
 public class Main extends Application implements EventHandler<KeyEvent>, GameEngine.OnAction {
     GameState gameState = new GameState();
     private static int LEFT = 1;
@@ -33,12 +33,15 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     private RestartGame restartGame = new RestartGame();
     private LoadGame loadGame = new LoadGame();
 
+    /**
+     * returns the game engine instance
+     * @return game engine value
+     */
     public GameEngine getEngine() {
         return engine;
     }
 
     //public static String savePath = "D:/save/save.mdds";
-    // Define a constant for the save directory
 
     public static final String savePath = "C:/Users/Khalid/Desktop/BlockBreakerTest";
     //public static String savePathDir = "D:/save/";
@@ -52,13 +55,17 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
     Button load = null;
     Button newGame = null;
 
+    /**
+     * start method responsible for setting the stage for the game such as creating the ball, the paddle, loading in a save if the load option is chosen
+     * @param primaryStage start method takes an instance of Stage called primaryStage
+     */
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) { // start method takes in a Stage parameter
         try {
             this.primaryStage = primaryStage;
 
-            rect = new Paddle();
-            ball = new CreateBall();
+            rect = new Paddle(); // initialising paddle
+            ball = new CreateBall(); // initialising the ball
 
             physicsEngine = new PhysicsEngine(this,ball, rect, engine);
 
@@ -153,6 +160,10 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         launch(args);
     }
 
+    /**
+     * handle method is used to perform certain operations if certain buttons are pressed
+     * @param event parameter is used to identify if any significant buttons were pressed and to handle appropriately
+     */
     @Override
     public void handle(KeyEvent event) {
         switch (event.getCode()) {
@@ -160,7 +171,6 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                 move(LEFT);
                 break;
             case RIGHT:
-
                 move(RIGHT);
                 break;
             case DOWN:
@@ -178,7 +188,10 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
-    private void pauseGame() {
+    /**
+     * pauseGame method is responsible for pausing the game engine
+     */
+    private void pauseGame() { // method responsible for pausing game when user presses P
         gameState.isPaused = !gameState.isPaused;
 
         if (gameState.isPaused) {
@@ -188,7 +201,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
-    private void move(final int direction) {
+    /**
+     * move method is responsible for moving the paddle if the user presses the left or right arrow
+     * @param direction parameter is used to determine which way the paddle should move
+     */
+    private void move(final int direction) { // move method to control the movement of the paddle
         if (!gameState.isPaused) {
             int step = (direction == RIGHT) ? 30 : -30;
 
@@ -209,6 +226,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
+    /**
+     * checkDestroyed count method checks if all blocks in the current level were destroyed to determine whether to go to the next level or not
+     */
     private void checkDestroyedCount() {
         if (gameState.destroyedBlockCount == board.gameState.blocks.size()) {
             //TODO win level todo...
@@ -218,32 +238,28 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         }
     }
 
-    private void nextLevel() {
+    /**
+     * nextLevel method is responsible for going to the next level when all block in the current one are destroyed
+     */
+    private void nextLevel() { // nextLevel method responsible for taking user to the next level when all blocks are destroyed
         System.out.println("Entering next level");
         Platform.runLater(() -> {
             try {
-                gameState.vX = 0.800;
 
-                engine.stop();
+                engine.stop(); // resetting the game to its original state to go to the next level
                 gameState.resetCollideFlags();
                 gameState.goDownBall = true;
-
                 gameState.isGoldStatus = false;
                 gameState.isExistHeartBlock = false;
                 gameState.isSizeBoost = false;
                 gameState.isPaddleSmall = false;
-
-
                 gameState.hitTime = 0;
                 gameState.time = 0;
                 gameState.goldTime = 0;
                 gameState.sizeBoostTime = 0;
                 gameState.paddleSmalltime = 0;
-
                 gameState.yBall = 500.0f;
                 gameState.xBall = 250;
-
-                //engine.stop();
                 board.gameState.blocks.clear();
                 board.gameState.chocos.clear();
                 gameState.destroyedBlockCount = 0;
@@ -254,6 +270,11 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
             }
         });
     }
+
+    /**
+     * onUpdate method is responsible for incrementing score and decrementing lives, it is also responsible for making blocks invisible when they are destroyed,
+     * onUpdate is also responsible for activating power-ups or dropping bonuses when special blocks are destroyed
+     */
 
     @Override
     public void onUpdate() {
@@ -291,30 +312,29 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
                         block.rect.setVisible(false);
                         block.isDestroyed = true;
                         gameState.destroyedBlockCount++;
-                        //System.out.println("size is " + blocks.size());
                         gameState.resetCollideFlags();
 
-                        if (block.type == Block.BLOCK_PADDLESMALL) {
+                        if (block.type == Block.BLOCK_PADDLESMALL) { // If a block of this type is destroyed the paddle becomes smaller for a set time
                             System.out.println("Small Paddle");
                             gameState.paddleSmalltime = gameState.time;
                             gameState.isPaddleSmall = true;
                         }
 
-                        if (block.type == Block.BLOCK_SIZEBOOST) {
+                        if (block.type == Block.BLOCK_SIZEBOOST) { // If a block of this type is destroyed the ball becomes larger for a set time
                             System.out.println("Size Boost");
                             gameState.sizeBoostTime = gameState.time;
                             gameState.ballRadius = 20;
                             gameState.isSizeBoost = true;
                         }
 
-                        if (block.type == Block.BLOCK_CHOCO) {
+                        if (block.type == Block.BLOCK_CHOCO) { // If a block of this type is destroyed a bonus is dropped that gives the user bonus points if collected
                             final Bonus choco = new Bonus(block.row, block.column);
                             choco.timeCreated = gameState.time;
                             Platform.runLater(() -> root.getChildren().add(choco.choco));
                             board.gameState.chocos.add(choco);
                         }
 
-                        if (block.type == Block.BLOCK_STAR) {
+                        if (block.type == Block.BLOCK_STAR) { // If a block of this type is destroyed the ball becomes gold and can pass through blocks, and the user will not lose lives if the ball touches
                             gameState.goldTime = gameState.time;
                             ball.setFill(new ImagePattern(new Image("goldball.png")));
                             System.out.println("gold ball");
@@ -353,6 +373,9 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
 
     }
 
+    /**
+     * onPhysics update controls how long each special effect lasts and for awarding points for a collected bonus
+     */
     @Override
     public void onPhysicsUpdate() {
         checkDestroyedCount();
@@ -413,7 +436,10 @@ public class Main extends Application implements EventHandler<KeyEvent>, GameEng
         //System.out.println("time is:" + time + " goldTime is " + goldTime);
     }
 
-
+    /**
+     * onTime method responsible for setting the time
+     * @param time is used to keep track of time
+     */
     @Override
     public void onTime(long time) {
         this.gameState.time = time;

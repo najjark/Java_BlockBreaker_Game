@@ -6,6 +6,9 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 
+/**
+ * GameState class is used to store variables and set their initial values
+ */
 public class GameState {
 
     public int level;
@@ -126,6 +129,9 @@ public class GameState {
 
     }
 
+    /**
+     * resetCollideFlags is used to reset all collision flags to false
+     */
     public void resetCollideFlags() {
         collideToBreak = false;
         collideToBreakAndMoveToRight = false;

@@ -8,6 +8,9 @@ import javafx.scene.shape.Rectangle;
 
 import java.io.Serializable;
 
+/**
+ * Block class is responsible for collision detection between the ball and the blocks
+ */
 public class Block implements Serializable {
     private static Block block = new Block(-1, -1, Color.TRANSPARENT, 99);
 
@@ -44,6 +47,7 @@ public class Block implements Serializable {
     public static  int BLOCK_PADDLESMALL = 104;
 
     public static double buffer = 3; // Adjust this buffer as needed
+
     public Block(int row, int column, Color color, int type) {
         this.row = row;
         this.column = column;
@@ -53,6 +57,9 @@ public class Block implements Serializable {
         draw();
     }
 
+    /**
+     * draw method is responsible for filling colors and pictures in blocks
+     */
     private void draw() {
         x = (column * width) + paddingH;
         y = (row * height) + paddingTop;
@@ -89,7 +96,13 @@ public class Block implements Serializable {
 
     }
 
-
+    /**
+     * checkHitToBlock method checks which side the ball collides with the block
+     * @param xBall x position of the ball
+     * @param yBall y position of the ball
+     * @param ball ball object
+     * @return the method returns the corresponding side that the ball made contact with the block, and if it is destroyed it returns no hit
+     */
     public int checkHitToBlock(double xBall, double yBall, CreateBall ball) {
 
         if (isDestroyed) {
@@ -105,17 +118,6 @@ public class Block implements Serializable {
             //System.out.println("Collision with left side of the block!");
             return HIT_LEFT;
         }
-
-
-        /* if (xBall >= x && xBall <= x + width && yBall == y + height) {
-            //System.out.println("Collision with bottom side of the block!");
-            return HIT_BOTTOM;
-        }
-
-        if (xBall >= x && xBall <= x + width && yBall == y) {
-            //System.out.println("Collision with top side of the block!");
-            return HIT_TOP;
-        } */
 
         if (yBall >= y - ball.getRadius() - buffer && yBall <= y + buffer && xBall >= x && xBall <= x + width) {
             // System.out.println("Collision with top side of the block!");
@@ -161,6 +163,21 @@ public class Block implements Serializable {
         if (yBall + Main.ballRadius >= y - buffer && yBall - Main.ballRadius <= y + height + buffer && xBall + Main.ballRadius >= x - buffer && xBall - Main.ballRadius <= x + buffer) {
             return HIT_LEFT;
         } */
+
+
+
+        /* if (xBall >= x && xBall <= x + width && yBall == y + height) {
+            //System.out.println("Collision with bottom side of the block!");
+            return HIT_BOTTOM;
+        }
+
+        if (xBall >= x && xBall <= x + width && yBall == y) {
+            //System.out.println("Collision with top side of the block!");
+            return HIT_TOP;
+        } */
+
+
+
 
 
 
