@@ -1,6 +1,3 @@
-### Name: Khalid Al Najjar
-### Student ID: 20490270
-
 # Game Compilation and Execution Instructions
 
 ## Using IntelliJ
