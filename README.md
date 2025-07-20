@@ -37,14 +37,3 @@
 1. Main: Moved some methods out of main to try to make each class have a single responsibility.
 2. Block: Adjusted collision physics to make the ball react appropriately with block collisions.
 3. Score: Adjusted class to properly print labels in the game, for example when lives are deducted or a bonus is picked up.
-
-# Features Not Implemented and Reasons
-
-1. Special blocks that cannot be destroyed by the ball, as the ball was not detecting that the block existed.
-2. Sound effects for certain events in the game.
-
-# Unexpected Problems
-
-1. Issues included moving methods around to other classes.
-2. Fixing the collision detection between the ball and blocks.
-
