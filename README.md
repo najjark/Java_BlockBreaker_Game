@@ -17,10 +17,6 @@
 5. Added a power-up which makes the paddle smaller for a short time.
 6. Press P to pause the game.
 
-# Features Not Working Properly
-
-1. Gold ball awards 2 points for every block destroyed instead of 1.
-
 # New Java Classes Introduced
 
 1. [CreateBoard](src/main/java/brickGame/CreateBoard.java): Used to create blocks in the game.
